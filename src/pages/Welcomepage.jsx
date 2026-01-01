@@ -1,13 +1,16 @@
 import Navbar from "../components/Navbar";
 import dactor from "../assets/dactor.png";
+import bloody from "../assets/blooddy.png"
+import union from "../assets/union.jpg"
+import emergency from "../assets/emergency.jpg"
 
 function Welcomepage(){
     return(
-        <div className="min-h-screen">
+        <div className="min-h-screen overflow-y-auto">
             <Navbar/>
-        <div className ="pt-16 h-[500px] w-full
+        <div className ="pt-16 pb-20   h-[500px]  w-full
          bg-gradient-to-b from-[#FFE5E5] to-[#FF6B6B]
-          flex  ">
+          flex  relative ">
 
               <div className="absolute top-20 left-10 w-20 h-20 bg-red-300 rounded-full opacity-30"></div>
               <div className="absolute bottom-10 right-20 w-32 h-32 bg-pink-400 rounded-full opacity-20"></div>
@@ -34,17 +37,51 @@ function Welcomepage(){
     </button>
     </div>
               </div> 
-            <div className="w-1/2 flex justify-end mr-12 items-center">
+            <div className="w-1/2 flex justify-end mr-12 mt-12 items-center ">
             <img 
             src ={dactor}
             alt="img"
             className="h-96 object-contain border-2 border-red-600"></img>
             </div>
+             </div>
 
           
             
-        </div>
-        </div>
+       
+
+        <div className="text-red-600 flex justify-center  font-bold text-4xl mt-8 ">
+            Our Mission</div>
+      
+
+        <div className="flex justify-center mt-4">
+  <p className="text-gray-700 text-lg text-center max-w-xl">
+    Saving lives through timely blood donations across Nepal.
+  </p>
+</div>
+
+<div className="flex justify-around mt-8 px-10">
+  <div className="flex flex-col items-center gap-2">
+    <img src={bloody} alt="blood" className="h-16" />
+    <p className="text-black font-medium text-center">Blood Donation Awareness</p>
+  </div>
+
+  <div className="flex flex-col items-center gap-2">
+    <img src={union} alt="education" className="h-16" />
+    <p className="text-black font-medium text-center">Community Education</p>
+  </div>
+
+  <div className="flex flex-col items-center gap-2">
+    <img src={emergency} alt="emergency" className="h-16" />
+    <p className="text-black font-medium text-center">Emergency Support</p>
+  </div>
+</div>
+
+
+</div>
+
+
+
+        
 
     );
 
