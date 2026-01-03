@@ -11,8 +11,8 @@ object-contain	Entire image visible, keeps proportions, may leave empty space */
       <div className="flex gap-10"> 
         <Link to="/" className="text-sm font-medium text-black hover:text-red-600">Home</Link>
         <Link to="/" className="text-sm font-medium text-black hover:text-red-600">About</Link>
-        <Link to="/" className="text-sm font-medium text-black hover:text-red-600">Signup</Link>
-        <Link to="/" className="text-sm font-medium text-black hover:text-red-600">Login</Link>
+        <Link to="/signup" className="text-sm font-medium text-black hover:text-red-600">Signup</Link>
+        <Link to="/login" className="text-sm font-medium text-black hover:text-red-600">Login</Link>
       </div>
 
     </nav>
