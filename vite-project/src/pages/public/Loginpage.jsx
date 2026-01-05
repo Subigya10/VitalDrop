@@ -1,37 +1,40 @@
-import Navbar from "../components/Navbar";
-import sleep from "../assets/sleep.jpg"; // use same illustration or login one
+import Navbar from "../../components/Navbar";
+import sleep from "../../assets/sleep.jpg";
 import { useForm } from "react-hook-form";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import LoginSchema from "../../schema/login.schema";
+import { useApi } from "../../hooks/useApi"; // your hook
 
 function LoginPage() {
-  const navigate=useNavigate();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const navigate = useNavigate();
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(LoginSchema),
+  });
+
+  const { loading, error, callApi } = useApi();
 
   const onSubmit = async (data) => {
     try {
-      // Send login request to backend
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await callApi("POST", "/auth/login", {
+        data:{
         email: data.identifier,
         password: data.password,
+        },
       });
 
       // Save token in localStorage
-      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("token", res.token); // adjust to match backend response
 
       alert("Login successful!");
-      console.log(res.data);
+      console.log(res);
 
       // Redirect to dashboard (or any page)
       navigate("/dashboard");
     } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
-      console.log(err);
+      console.log("Login error:", err.message);
+      alert(err.message || "Login failed");
     }
   };
 
@@ -53,30 +56,22 @@ function LoginPage() {
             <input
               type="text"
               placeholder="Email or Phone"
-              {...register("identifier", {
-                required: "Email or phone is required",
-              })}
+              {...register("identifier")}
               className="border rounded px-3 py-2 w-full"
             />
             {errors.identifier && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.identifier.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.identifier.message}</p>
             )}
 
             {/* Password */}
             <input
               type="password"
               placeholder="Password"
-              {...register("password", {
-                required: "Password is required",
-              })}
+              {...register("password")}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
 
             {/* Remember Me */}
@@ -89,8 +84,9 @@ function LoginPage() {
             <button
               type="submit"
               className="bg-red-600 hover:bg-red-700 text-white w-full py-2 rounded mt-5"
+              disabled={loading}
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
 
             {/* Forgot Password */}
@@ -105,11 +101,7 @@ function LoginPage() {
 
           {/* Right: Illustration */}
           <div className="w-1/2 bg-red-50 flex items-center justify-center">
-            <img
-              src={sleep}
-              alt="Login Illustration"
-              className="max-h-[420px]"
-            />
+            <img src={sleep} alt="Login Illustration" className="max-h-[420px]" />
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
-import Navbar from "../components/Navbar";
-import dactor from "../assets/dactor.png";
-import bloody from "../assets/blooddy.png"
-import union from "../assets/union.jpg"
-import emergency from "../assets/emergency.jpg"
-import {Link} from "react-router-dom";
+import Navbar from "../../components/Navbar";
+import dactor from "../../assets/dactor.png";
+import bloody from "../../assets/blooddy.png"
+import union from "../../assets/union.jpg"
+import emergency from "../../assets/emergency.jpg"
+
 
 function Welcomepage(){
     return(

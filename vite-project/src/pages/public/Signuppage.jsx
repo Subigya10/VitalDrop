@@ -1,22 +1,28 @@
-import Navbar from "../components/Navbar";
-import sleep from "../assets/sleep.jpg";
+import Navbar from "../../components/Navbar";//zod and lazy loading
+import sleep from "../../assets/sleep.jpg";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {zodResolver} from "@hookform/resolvers/zod"
+import { RegisterSchema } from "../../schema/register.schema";
+import { useApi } from "../../hooks/useApi"; 
+
+
 
 function Signuppage() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm({ resolver:zodResolver(RegisterSchema)});
+      const { loading, error, callApi } = useApi();
+
+  console.log(errors);
 
   const onSubmit = async (data) => {
     try {
       // Optional: check if passwords match
-      if (data.password !== data.confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-      }
+   
 
-      const res = await axios.post("http://localhost:5000/api/users", {
+      const res = await callApi("POST", "/users",  {
+        data:{
         fullName: data.firstName + " " + data.lastName,
         email: data.email,
         password: data.password,
@@ -26,6 +32,7 @@ function Signuppage() {
         bloodGroup: null, // optional
         medicalHistory: null, // optional
         dateOfBirth: null, // optional
+        }
       });
 
       alert("Signup successful! Please login.");
@@ -60,7 +67,7 @@ function Signuppage() {
                 <input
                   type="text"
                   placeholder="First Name"
-                  {...register("firstName", { required: "First name is required" })}
+                  {...register("firstName")}
                   className="border rounded px-3 py-2 w-full"
                 />
                 {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
@@ -70,7 +77,7 @@ function Signuppage() {
                 <input
                   type="text"
                   placeholder="Last Name"
-                  {...register("lastName", { required: "Last name is required" })}
+                  {...register("lastName")}
                   className="border rounded px-3 py-2 w-full"
                 />
                 {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
@@ -81,7 +88,7 @@ function Signuppage() {
             <input
               type="email"
               placeholder="Email"
-              {...register("email", { required: "Email is required" })}
+              {...register("email")}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
@@ -90,7 +97,7 @@ function Signuppage() {
             <input
               type="tel"
               placeholder="Phone Number"
-              {...register("phone", { required: "Phone number is required" })}
+              {...register("phone")}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
@@ -99,7 +106,7 @@ function Signuppage() {
             <input
               type="password"
               placeholder="Password"
-              {...register("password", { required: "Password is required", minLength: { value: 6, message: "Minimum 6 characters" } })}
+              {...register("password")}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
@@ -108,7 +115,7 @@ function Signuppage() {
             <input
               type="password"
               placeholder="Confirm Password"
-              {...register("confirmPassword", { required: "Please confirm your password" })}
+              {...register("confirmPassword")}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
