@@ -44,4 +44,11 @@ export const Users = sequelize.define("users", {
     type: DataTypes.DATEONLY, 
     allowNull: true 
   },
+
+    role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "user" // <-- all new signups are normal users
+  
+  },
 });

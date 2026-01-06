@@ -113,3 +113,23 @@ export const deleteProductById = async (req, res) => {
     res.status(500).send({ message: e.message });
   }
 };
+
+
+/* GET ALL PRODUCTS - ADMIN ONLY */
+export const getAdminProducts = async (req, res) => {
+  try {
+    const userRole = req.user.role; // comes from JWT middleware
+
+    if (userRole !== "admin") {
+      return res.status(403).send({ message: "Forbidden: Admins only" });
+    }
+
+    const products = await Products.findAll(); // fetch all products
+    res.status(200).send({
+      data: products,
+      message: "Admin products fetched successfully",
+    });
+  } catch (e) {
+    res.status(500).send({ message: e.message });
+  }
+};

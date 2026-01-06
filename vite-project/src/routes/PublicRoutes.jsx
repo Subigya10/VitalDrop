@@ -4,12 +4,13 @@ import {Routes ,Route,Navigate} from "react-router-dom"
 // import Signuppage from "./pages/public/Signuppage.jsx";
 // import Loginpage from "./pages/public/Loginpage.jsx";
 import React,{Suspense} from "react";
-import Welcomepage from "../pages/public/Welcomepage.jsx";
+// import Welcomepage from "../pages/public/Welcomepage.jsx";
 
 
 
 const UserLogin =React.lazy(()=>import("../pages/public/Loginpage.jsx"));
 const UserRegister =React.lazy(()=>import("../pages/public/Signuppage.jsx"));
+const Welcomepagee = React.lazy(() => import("../pages/public/Welcomepage.jsx"));
 
 
 
@@ -28,7 +29,7 @@ const PublicRoutes=()=>{
 <Suspense fallback={<div>.........loading</div>}>
       <Routes>
         
-      <Route path ="/welcome" element ={<Welcomepage/>}/>
+      <Route path ="/welcome" element ={<Welcomepagee/>}/>
       <Route path ="/signup" element ={<UserRegister/>}/>
       <Route path ="/login" element ={<UserLogin/>}/>
               <Route path="*" element={<Navigate to="/welcome" />} />

@@ -3,9 +3,9 @@ import sleep from "../../assets/sleep.jpg";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {zodResolver} from "@hookform/resolvers/zod"
+import {zodResolver} from "@hookform/resolvers/zod";
 import { RegisterSchema } from "../../schema/register.schema";
-import { useApi } from "../../hooks/useApi"; 
+import { useApi } from "../../hooks/useAPi"; 
 
 
 
@@ -32,6 +32,7 @@ function Signuppage() {
         bloodGroup: null, // optional
         medicalHistory: null, // optional
         dateOfBirth: null, // optional
+        role:"user",
         }
       });
 

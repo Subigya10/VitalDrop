@@ -1,91 +1,228 @@
+import React from "react";
 import Navbar from "../../components/Navbar";
 import dactor from "../../assets/dactor.png";
-import bloody from "../../assets/blooddy.png"
-import union from "../../assets/union.jpg"
-import emergency from "../../assets/emergency.jpg"
+import bloody from "../../assets/blooddy.png";
+import union from "../../assets/union.jpg";
+import emergency from "../../assets/emergency.jpg";
+import { Heart, Users, Activity, Shield, MapPin, Clock, Award } from "lucide-react";
 
+function Welcomepage() {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <Navbar />
 
-function Welcomepage(){
-    return(
-        <div className="min-h-screen overflow-y-auto">
-            <Navbar/>
-        <div className ="pt-16 pb-20   h-[500px]  w-full
-         bg-gradient-to-b from-[#FFE5E5] to-[#FF6B6B]
-          flex  relative ">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-b bg-red-50 pt-16 pb-24 flex flex-col md:flex-row items-center overflow-hidden">
+        {/* Background Circles */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-red-300 rounded-full opacity-30"></div>
+        <div className="absolute bottom-10 right-20 w-32 h-32 bg-pink-400 rounded-full opacity-20"></div>
+        <div className="absolute bottom-32 left-32 w-24 h-24 bg-pink-300 rounded-full opacity-15"></div>
 
-              <div className="absolute top-20 left-10 w-20 h-20 bg-red-300 rounded-full opacity-30"></div>
-              <div className="absolute bottom-10 right-20 w-32 h-32 bg-pink-400 rounded-full opacity-20"></div>
-      
-              <div className="absolute bottom-32 left-32 w-24 h-24 bg-pink-300 rounded-full opacity-15"></div>
+        {/* Hero Text */}
+        <div className="md:w-2/3 px-8 md:px-16 text-center md:text-left">
+          <h1 className="text-5xl md:text-7xl font-bold text-black mb-4">
+            Your blood can be someone's <span className="text-red-600">life</span>
+          </h1>
+          <p className="text-2xl md:text-3xl font-bold text-black mb-8">
+            Helping Nepal in Emergencies
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+            <button className="bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black transition">
+              Donate Blood
+            </button>
+            <button className="bg-red-600 text-white border-2 border-red-600 px-8 py-3 rounded-full font-bold hover:bg-white hover:text-black transition">
+              Learn More
+            </button>
+          </div>
+        </div>
 
+        {/* Hero Image */}
+        <div className="md:w-1/3 mt-8 md:mt-0 flex justify-center md:justify-end">
+          <img
+            src={dactor}
+            alt="Doctor"
+            className="h-96 w-auto object-contain border-2 border-red-600 rounded-xl shadow-lg"
+          />
+        </div>
+      </section>
 
-              <div className="w-2/3 " >
-              <h1 className="text-7xl font-bold text-black mt-12 ml-10">
-              Your blood can be someone's <span className ="text-red-600">life </span>
-              </h1>
-              <h1 className ="text-3xl text-black font-bold ml-12 mt-6 ">
-                Helping Nepal in Emergencies
-              </h1>
-
-
-               <div className="flex mt-16 ml-48 gap-4">
-               <button className="bg-red-600 text-white px-6 py-3 border-2 border-red-600 rounded-full font-bold hover:bg-white hover:text-black transition ">
-            Donate Blood
-           </button>
-
-          <button className="bg-red-600 text-white border-2 border-red-600 px-8 py-4 rounded-full font-bold hover:bg-white hover:text-black transition">
-      Learn More
-    </button>
-    </div>
-              </div> 
-            <div className="w-1/2 flex justify-end mr-12 mt-12 items-center ">
-            <img 
-            src ={dactor}
-            alt="img"
-            className="h-96 object-contain border-2 border-red-600"></img>
+      {/* Our Mission */}
+                  <div className="py-16 bg-white">
+                <div className="max-w-7xl mx-auto px-6">
+                    <h2 className="text-4xl font-bold text-center text-red-600 mb-4">Our Mission</h2>
+                    <p className="text-center text-gray-600 text-lg max-w-2xl mx-auto mb-12">
+                        We help our patients live a healthy, longer life by improving access to blood donations
+                    </p>
+                    
+                    <div className="grid grid-cols-3 gap-8">
+                        <div className="bg-red-50 p-8 rounded-lg text-center">
+                            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Activity className="text-red-600" size={32} />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Blood Donation Awareness</h3>
+                            <p className="text-gray-600 text-sm">
+                                Educating communities about the importance of regular blood donation
+                            </p>
+                        </div>
+                        
+                        <div className="bg-red-50 p-8 rounded-lg text-center">
+                            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Users className="text-red-600" size={32} />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Community Education</h3>
+                            <p className="text-gray-600 text-sm">
+                                Building a strong network of donors and volunteers across Nepal
+                            </p>
+                        </div>
+                        
+                        <div className="bg-red-50 p-8 rounded-lg text-center">
+                            <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Shield className="text-red-600" size={32} />
+                            </div>
+                            <h3 className="font-bold text-lg mb-2">Emergency Support</h3>
+                            <p className="text-gray-600 text-sm">
+                                Providing rapid response to urgent blood requirements 24/7
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-             </div>
 
-          
-            
-       
+      {/* Stats Section */}
+      <section className="py-16 bg-gray-50 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-12">Our Impact</h2>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
+          <div>
+            <p className="text-5xl font-bold text-red-600">75,450+</p>
+            <p className="text-gray-600 mt-2">Blood Donations</p>
+          </div>
+          <div>
+            <p className="text-5xl font-bold text-red-600">5,200+</p>
+            <p className="text-gray-600 mt-2">Active Donors</p>
+          </div>
+          <div>
+            <p className="text-5xl font-bold text-red-600">1,500+</p>
+            <p className="text-gray-600 mt-2">Lives Saved</p>
+          </div>
+        </div>
+      </section>
 
-        <div className="text-red-600 flex justify-center  font-bold text-4xl mt-8 ">
-            Our Mission</div>
-      
+      {/* Stories of Hope */}
+      <section className="py-16 bg-white text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-12">Stories of Hope</h2>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-6">
+          <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Heart size={24} className="text-red-600" fill="currentColor" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Saved by a Stranger</h3>
+                <p className="text-sm text-gray-500">Donor Story - 2 months ago</p>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm">
+              "I received blood during an emergency surgery. Thanks to anonymous donors, I'm here today with my family."
+            </p>
+          </div>
 
-        <div className="flex justify-center mt-4">
-  <p className="text-gray-700 text-lg text-center max-w-xl">
-    Saving lives through timely blood donations across Nepal.
-  </p>
-</div>
+          <div className="border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-lg transition">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Award size={24} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">100 Times Donor</h3>
+                <p className="text-sm text-gray-500">Achievement - 1 month ago</p>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm">
+              "I've donated blood 100 times. It's the simplest way to save lives and give back to the community."
+            </p>
+          </div>
+        </div>
+      </section>
 
-<div className="flex justify-around mt-8 px-10">
-  <div className="flex flex-col items-center gap-2">
-    <img src={bloody} alt="blood" className="h-16" />
-    <p className="text-black font-medium text-center">Blood Donation Awareness</p>
-  </div>
+      {/* Find a Session */}
+      <section className="py-16 bg-red-50 text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">Find a Session</h2>
+        <p className="text-gray-600 mb-8">Locate nearby blood donation camps and schedule your visit</p>
+        <div className="flex flex-col md:flex-row justify-center gap-8 px-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm flex items-center gap-4 hover:shadow-lg transition">
+            <MapPin className="text-red-600" size={32} />
+            <div className="text-left">
+              <h3 className="font-bold">Safety & Assurance</h3>
+              <p className="text-sm text-gray-600">All equipment is sterile & disposable</p>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm flex items-center gap-4 hover:shadow-lg transition">
+            <Activity className="text-red-600" size={32} />
+            <div className="text-left">
+              <h3 className="font-bold">Health Benefits</h3>
+              <p className="text-sm text-gray-600">Reduces risk of heart disease</p>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow-sm flex items-center gap-4 hover:shadow-lg transition">
+            <Clock className="text-red-600" size={32} />
+            <div className="text-left">
+              <h3 className="font-bold">Quick Process</h3>
+              <p className="text-sm text-gray-600">Takes only 10-15 minutes</p>
+            </div>
+          </div>
+        </div>
+        <button className="mt-8 bg-red-600 text-white px-8 py-3 rounded-md hover:bg-red-700 font-medium">
+          Find Nearest Location
+        </button>
+      </section>
 
-  <div className="flex flex-col items-center gap-2">
-    <img src={union} alt="education" className="h-16" />
-    <p className="text-black font-medium text-center">Community Education</p>
-  </div>
-
-  <div className="flex flex-col items-center gap-2">
-    <img src={emergency} alt="emergency" className="h-16" />
-    <p className="text-black font-medium text-center">Emergency Support</p>
-  </div>
-</div>
-
-
-</div>
-
-
-
-        
-
-    );
-
-   
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Heart size={24} fill="currentColor" />
+                <span className="text-xl font-bold">VitalDrop</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Saving lives through blood donation across Nepal
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Quick Links</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>About Us</li>
+                <li>Find Blood</li>
+                <li>Donate</li>
+                <li>Contact</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li>Eligibility</li>
+                <li>FAQs</li>
+                <li>Blood Types</li>
+                <li>Health Tips</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Contact Us</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li className="flex items-center gap-2">+977-1-234567</li>
+                <li className="flex items-center gap-2">info@lifeflow.org</li>
+                <li className="flex items-center gap-2">Kathmandu, Nepal</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-sm text-gray-400">
+            &copy; 2026 LifeFlow. All rights reserved. Saving lives one donation at a time.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
- export default Welcomepage;
+
+export default Welcomepage;

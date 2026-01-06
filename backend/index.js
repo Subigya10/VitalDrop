@@ -9,9 +9,9 @@ const app = express();
 // Connect database
 connection();
 
-// Middleware
+// Middlewarea
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: "http://localhost:5181"
 }));
 
 app.use(express.json());

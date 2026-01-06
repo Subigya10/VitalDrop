@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoginSchema from "../../schema/login.schema";
-import { useApi } from "../../hooks/useApi"; // your hook
+import { useApi } from "../../hooks/useAPi"; 
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -24,8 +24,13 @@ function LoginPage() {
         },
       });
 
+      console.log("Login response:", res);
+console.log("Role saved in localStorage:", res.user?.role);
+
+
       // Save token in localStorage
-      localStorage.setItem("token", res.token); // adjust to match backend response
+      localStorage.setItem("access_token", res.access_token); 
+      localStorage.setItem("role", res.user.role);
 
       alert("Login successful!");
       console.log(res);

@@ -18,7 +18,16 @@ export const login = async (req, res) => {
     const { password: _, ...userWithoutPassword } = user.toJSON();
     const token = generateToken({ user: userWithoutPassword });
 
-    res.status(200).json({ access_token: token, message: "Token generated successfully" });
+   res.status(200).json({
+  access_token: token,
+  message: "Token generated successfully",
+  user: {
+    userId: user.userId,
+    email: user.email,
+    role: user.role,
+  },
+});
+
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
