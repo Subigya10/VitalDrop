@@ -11,7 +11,7 @@ connection();
 
 // Middlewarea
 app.use(cors({
-  origin: "http://localhost:5181"
+  origin: "http://localhost:5174"
 }));
 
 app.use(express.json());
