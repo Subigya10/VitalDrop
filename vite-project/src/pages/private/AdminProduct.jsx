@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 function AdminUserProducts() {
-  // ✅ Seed products (pre-filled like Daraz)
+
   const seedProducts = [
     { _id: "1", name: "Nike Shoes", price: 5000, category: "Shoes", description: "Running shoes" },
     { _id: "2", name: "Adidas Sneakers", price: 6000, category: "Shoes", description: "Sports sneakers" },

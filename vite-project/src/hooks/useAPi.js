@@ -17,7 +17,7 @@ export const useApi = () => {
     } catch (err) {
       setLoading(false);
       setError(err.message);
-      throw err;
+      throw new Error(errorMsg);
     }
   };
 

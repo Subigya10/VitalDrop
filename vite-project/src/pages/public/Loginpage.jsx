@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoginSchema from "../../schema/login.schema";
 import { useApi } from "../../hooks/useAPi"; 
+import { Link } from "react-router-dom";
+
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -96,7 +98,11 @@ console.log("Role saved in localStorage:", res.user?.role);
 
             {/* Forgot Password */}
             <p className="text-sm text-center text-red-600 mt-4 cursor-pointer">
-              Forgot Password?
+               <Link
+                  to="/forgotpass"  
+                  className="text-black-500 text-sm hover:underline"
+                > Forgot Password?</Link>
+             
             </p>
 
             <p className="text-xs text-center text-gray-400 mt-6">

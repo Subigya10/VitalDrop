@@ -1,7 +1,7 @@
 import Navbar from "../../components/Navbar";//zod and lazy loading
 import sleep from "../../assets/sleep.jpg";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
 import {zodResolver} from "@hookform/resolvers/zod";
 import { RegisterSchema } from "../../schema/register.schema";
