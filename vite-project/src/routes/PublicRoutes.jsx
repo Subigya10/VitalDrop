@@ -30,11 +30,11 @@ const PublicRoutes=()=>{
 <Suspense fallback={<div>.........loading</div>}>
       <Routes>
         
-      <Route path ="/welcome" element ={<Welcomepagee/>}/>
+      <Route path ="/" element ={<Welcomepagee/>}/>
       <Route path ="/signup" element ={<UserRegister/>}/>
       <Route path ="/login" element ={<UserLogin/>}/>
       <Route path ="/forgotpass" element ={<ForgotPassword/>}/>
-              <Route path="*" element={<Navigate to="/welcome" />} />
+      <Route path="*" element={<Navigate to="/" />} />
 
     
        

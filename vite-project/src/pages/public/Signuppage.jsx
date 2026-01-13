@@ -1,4 +1,4 @@
-import Navbar from "../../components/Navbar";//zod and lazy loading
+import Navbar from "../../components/Navbar";
 import sleep from "../../assets/sleep.jpg";
 import { useForm } from "react-hook-form";
 
@@ -6,11 +6,15 @@ import { useNavigate } from "react-router-dom";
 import {zodResolver} from "@hookform/resolvers/zod";
 import { RegisterSchema } from "../../schema/register.schema";
 import { useApi } from "../../hooks/useAPi"; 
+import {Eye, EyeOff} from "lucide-react";
+import { useState } from "react";
 
 
 
 function Signuppage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({ resolver:zodResolver(RegisterSchema)});
       const { loading, error, callApi } = useApi();
 
@@ -77,7 +81,7 @@ function Signuppage() {
               <div className="w-1/2">
                 <input
                   type="text"
-                  placeholder="Last Name"
+                  placeholder="Last Name(optional)"
                   {...register("lastName")}
                   className="border rounded px-3 py-2 w-full"
                 />
@@ -87,7 +91,7 @@ function Signuppage() {
 
             {/* Email */}
             <input
-              type="email"
+              type="text"
               placeholder="Email"
               {...register("email")}
               className="border rounded px-3 py-2 w-full mt-4"
@@ -99,27 +103,56 @@ function Signuppage() {
               type="tel"
               placeholder="Phone Number"
               {...register("phone")}
+              maxLength={10}
+
+               onInput={(e) => {
+    e.target.value = e.target.value.replace(/\D/g, ""); // remove non-digits
+  }}
               className="border rounded px-3 py-2 w-full mt-4"
             />
             {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
 
             {/* Password */}
-            <input
-              type="password"
-              placeholder="Password"
-              {...register("password")}
-              className="border rounded px-3 py-2 w-full mt-4"
-            />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            
+            <div className="relative mt-4">
+  <input
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    {...register("password")}
+    className="border rounded px-3 py-2 w-full pr-10"
+  />
 
-            {/* Confirm Password */}
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              {...register("confirmPassword")}
-              className="border rounded px-3 py-2 w-full mt-4"
-            />
-            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+  >
+    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+  </button>
+</div>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            )}
+           
+
+           <div className="relative mt-4">
+  <input
+    type={showConfirm ? "text" : "password"}
+    placeholder="Confirm Password"
+    {...register("confirmPassword")}
+    className="border rounded px-3 py-2 w-full pr-10"
+  />
+
+  <button
+    type="button"
+    onMouseDown={(e) => e.preventDefault()}
+    onClick={() => setShowConfirm(!showConfirm)}
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+  >
+    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+  </button>
+</div>
+
 
             {/* Terms */}
             <div className="flex items-center gap-2 mt-4">

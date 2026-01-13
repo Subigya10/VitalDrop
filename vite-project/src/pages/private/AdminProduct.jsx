@@ -75,7 +75,7 @@ function AdminUserProducts() {
       <h1>Product Catalog</h1>
       <p>Mini Daraz-style product page 🚀</p>
 
-      {/* 📝 Product Form */}
+   
       <form onSubmit={handleSubmit(onSubmit)} className="product-form">
         <input
           placeholder="Product name"

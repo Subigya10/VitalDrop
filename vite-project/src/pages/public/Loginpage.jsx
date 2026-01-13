@@ -6,10 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import LoginSchema from "../../schema/login.schema";
 import { useApi } from "../../hooks/useAPi"; 
 import { Link } from "react-router-dom";
+import {Eye, EyeOff} from "lucide-react";
+import { useState } from "react";
+
 
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);   
+
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(LoginSchema),
@@ -50,10 +56,10 @@ console.log("Role saved in localStorage:", res.user?.role);
       <Navbar />
 
       <div className="pt-36 pb-20 flex justify-center items-center">
-        <div className="max-w-6xl w-full bg-white rounded-xl shadow-lg flex overflow-hidden">
+        <div className="max-w-6xl w-full bg-white rounded-xl shadow-lg flex flex-col md:flex-row overflow-hidden">
 
           {/* Left: Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="w-1/2 p-10">
+          <form onSubmit={handleSubmit(onSubmit)} className="w-full md:w-1/2 p-6 md:p-10">
             <h1 className="text-2xl font-bold mb-1">Welcome Back</h1>
             <p className="text-gray-500 mb-6">
               Login to access your dashboard.
@@ -70,16 +76,26 @@ console.log("Role saved in localStorage:", res.user?.role);
               <p className="text-red-500 text-sm mt-1">{errors.identifier.message}</p>
             )}
 
-            {/* Password */}
-            <input
-              type="password"
-              placeholder="Password"
-              {...register("password")}
-              className="border rounded px-3 py-2 w-full mt-4"
-            />
+            <div className="relative mt-4">
+  <input
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    {...register("password")}
+    className="border rounded px-3 py-2 w-full pr-10"
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+  >
+    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+  </button>
+</div>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
+           
 
             {/* Remember Me */}
             <div className="flex items-center gap-2 mt-4">
@@ -111,7 +127,7 @@ console.log("Role saved in localStorage:", res.user?.role);
           </form>
 
           {/* Right: Illustration */}
-          <div className="w-1/2 bg-red-50 flex items-center justify-center">
+          <div className="hidden md:flex w-full md:w-1/2 bg-red-50 flex items-center justify-center">
             <img src={sleep} alt="Login Illustration" className="max-h-[420px]" />
           </div>
         </div>

@@ -12,9 +12,9 @@ const seedProducts = [
 function UserProductPage() {
   const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    setProducts(seedProducts);
-  }, []);
+  // useEffect(() => {
+  //   setProducts(seedProducts);
+  // }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
