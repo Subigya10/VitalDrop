@@ -1,12 +1,19 @@
 import express from "express";
-import { createBloodRequest, getActiveRequests } from "../Controller/requestController.js";
+import { 
+  createBloodRequest, 
+  getActiveRequests, 
+  acceptRequest 
+} from "../Controller/requestController.js";
+import { verifyToken } from "../Middleware/authmiddleware.js"; // Import it!
 
 const router = express.Router();
 
-// The "Post Request" URL
-router.post("/", createBloodRequest);
+// PROTECT THESE ROUTES
+// This ensures req.user.id is available in your controllers
+router.post("/", verifyToken, createBloodRequest); 
+router.patch("/accept/:id", verifyToken, acceptRequest);
 
-// The "Get all requests" URL (for your dashboard table)
+// KEEP THIS PUBLIC (so anyone can see the need for blood)
 router.get("/all", getActiveRequests);
 
 export { router as requestRouter };

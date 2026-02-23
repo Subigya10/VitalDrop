@@ -1,3 +1,4 @@
+// db.js
 import { Sequelize } from "sequelize";
 
 export const sequelize = new Sequelize(
@@ -5,17 +6,17 @@ export const sequelize = new Sequelize(
     "postgres",
     "iamsubi10@",
     {
-        "host": "localhost",
-        "dialect": "postgres",
+        host: "localhost",
+        dialect: "postgres",
     }
 );
- // connects node.js to postgresql
 
-export const connection = () => {
+export const connection = async () => {
     try {
-        sequelize.sync({alter :true}); // automatically creates table based on model
-        console.log("Database connected");
+        await sequelize.authenticate();
+        await sequelize.sync({ alter: true });
+        console.log("Database connected and synced!");
     } catch (e) {
         console.log("Database connection failed", e);        
     }
- }
+}

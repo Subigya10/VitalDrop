@@ -5,12 +5,14 @@ export const createBloodRequest = async (req, res) => {
   try {
     const { patientName, bloodGroup, unitsNeeded, hospitalLocation } = req.body;
 
-    // Use Sequelize to save to DB
+    // FIX: We must include the requesterId from the decoded token (verifyToken)
     const newRequest = await BloodRequests.create({
       patientName,
       bloodGroup,
       unitsNeeded,
-      hospitalLocation
+      hospitalLocation,
+      requesterId: req.user.id, // This links the request to YOU
+      status: "pending"
     });
 
     res.status(201).json({ 
@@ -19,6 +21,7 @@ export const createBloodRequest = async (req, res) => {
       data: newRequest 
     });
   } catch (error) {
+    // If you see "notNull Violation", it means req.user.id was missing
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -31,6 +34,34 @@ export const getActiveRequests = async (req, res) => {
       order: [['createdAt', 'DESC']] // Newest first
     });
     res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Logic for the "Respond" button
+export const acceptRequest = async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const donorId = req.user.id; 
+
+    const request = await BloodRequests.findByPk(id);
+
+    if (!request) {
+      return res.status(404).json({ success: false, message: "Request not found" });
+    }
+
+    // Safety: Don't let someone respond to their own request
+    if (request.requesterId === donorId) {
+      return res.status(400).json({ success: false, message: "You cannot respond to your own request!" });
+    }
+
+    // Update the record with the donor's ID
+    request.status = "accepted";
+    request.donorId = donorId;
+    await request.save();
+
+    res.status(200).json({ success: true, message: "Request accepted! Go be a hero.", data: request });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -7,11 +7,16 @@ export const BloodRequests = sequelize.define("BloodRequests", {
     primaryKey: true, 
     autoIncrement: true 
   },
-  // ADD THIS FIELD BELOW
-//   requesterId: {
-//     type: DataTypes.INTEGER,
-//     allowNull: false // Every request must belong to a user
-//   },
+  // The person who needs the blood
+  requesterId: {
+    type: DataTypes.INTEGER,
+    allowNull: false 
+  },
+  // The person who volunteers to give (starts as null)
+  donorId: {
+    type: DataTypes.INTEGER,
+    allowNull: true 
+  },
   patientName: { 
     type: DataTypes.STRING, 
     allowNull: false 
@@ -26,7 +31,7 @@ export const BloodRequests = sequelize.define("BloodRequests", {
   },
   hospitalLocation: { 
     type: DataTypes.STRING, 
-    allowable: false 
+    allowNull: false 
   },
   status: { 
     type: DataTypes.STRING, 

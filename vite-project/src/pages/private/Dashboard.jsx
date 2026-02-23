@@ -12,12 +12,10 @@ import RequestModal from './Requestblood';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [requestsData, setRequestsData] = useState([]); // Dynamic data state
+  const [requestsData, setRequestsData] = useState([]);
 
-  // --- 1. Fetch Data from Backend ---
   const fetchRequests = async () => {
     try {
-      // Hits your getActiveRequests controller
       const response = await axios.get('http://localhost:5000/api/requests/all');
       setRequestsData(response.data);
     } catch (error) {
@@ -25,12 +23,10 @@ const Dashboard = () => {
     }
   };
 
-  // Run once on mount
   useEffect(() => {
     fetchRequests();
   }, []);
 
-  // --- 2. Table Configuration (Updated for Sequelize keys) ---
   const columns = [
     { 
       name: 'Date', 
@@ -60,16 +56,22 @@ const Dashboard = () => {
     },
     { 
       name: 'Status', 
-      cell: row => (
-        row.status === 'pending' ? 
-        <button 
-          className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow-sm"
-          onClick={() => navigate('/emergency')}
-        >
-          Respond
-        </button> :
-        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">Completed</span>
-      )
+      cell: row => {
+        const myId = parseInt(localStorage.getItem("user_id"));
+
+        if (row.requesterId === myId) {
+          return <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">Your Request</span>;
+        }
+
+        return row.status === 'pending' ? 
+          <button 
+            className="bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow-sm"
+            onClick={() => navigate('/emergency')}
+          >
+            Respond
+          </button> :
+          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">Completed</span>
+      }
     },
   ];
 
@@ -176,7 +178,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Right Column (Impact) */}
+          {/* Right Column */}
           <div className="col-span-3 space-y-6">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h3 className="font-bold text-gray-800 mb-4">Your Impact</h3>
@@ -198,17 +200,15 @@ const Dashboard = () => {
         </div>
       </main>
       
-      {/* THE MODAL */}
       <RequestModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onRefresh={fetchRequests} // This refreshes the table after you post!
+        onRefresh={fetchRequests}
       />
     </div>
   );
 };
 
-// --- Helper Components ---
 const SidebarItem = ({ icon, label, to, active, color }) => (
   <NavLink to={to} className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive ? 'bg-red-50 text-red-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'} ${color}`}>
     {icon} {label}

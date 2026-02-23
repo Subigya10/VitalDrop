@@ -12,17 +12,22 @@ const RequestModal = ({ isOpen, onClose, onRefresh }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // 2. Sending cleaned data to your Express API
-      // Note: We are using the root URL '/' because we removed '/create' from the backend
-      const response = await axios.post('http://localhost:5000/api/requests', formData);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const token = localStorage.getItem('access_token');
+    console.log("TOKEN FROM STORAGE:", token); // ← ADD THIS
+
+      // 2. Add the headers to the axios call
+      const response = await axios.post('http://localhost:5000/api/requests', formData, {
+        headers: {
+          Authorization: `Bearer ${token}` // This matches your verifyToken middleware
+        }
+      });
       
       if (response.status === 201 || response.status === 200) {
         alert("Emergency Request Posted!");
         
-        // 3. Clear the form for next time
         setFormData({
           patientName: '',
           bloodGroup: 'A+',
@@ -30,14 +35,17 @@ const RequestModal = ({ isOpen, onClose, onRefresh }) => {
           hospitalLocation: '',
         });
 
-        // 4. Close modal and trigger a refresh of the dashboard table
         if (onRefresh) onRefresh();
         onClose();
       }
     } catch (err) {
       console.error("Error saving request:", err);
-      // Helpful alert to guide you to the VS Code terminal
-      alert("Failed to save. Check your Backend Terminal for the specific SQL error!");
+      // If the error is 401, it means the token is missing or invalid
+      if (err.response?.status === 401) {
+        alert("Session expired. Please login again.");
+      } else {
+        alert("Failed to save. Check your Backend Terminal!");
+      }
     }
   };
 

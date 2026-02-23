@@ -1,18 +1,37 @@
+// Middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 
-// This middleware checks if the user is logged in and attaches user info
+/**
+ * Middleware to verify the JWT token and attach user data to the request.
+ * Essential for VitalDrop to track requesterId and donorId.
+ */
 export const verifyToken = (req, res, next) => {
-  // Expect the token in Authorization header: "Bearer <TOKEN>"
+  // 1. Get the token from the Authorization header
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).send({ message: "No token provided" });
+  
+  // 2. Check if the header exists and starts with "Bearer "
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).send({ message: "No token provided. Please login again." });
+  }
 
+  // 3. Extract the token (removing the "Bearer " prefix)
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // use same secret as in generateToken
-    req.user = decoded.user; // attach user info (id, role, etc.) to request
-    next(); // go to the next middleware/controller
+    // 4. Verify the token using your secret key
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    /**
+     * IMPORTANT: Since your generateToken signs the payload directly:
+     * jwt.sign(payload, ...) -> decoded IS the payload.
+     * We attach it directly to req.user.
+     */
+    req.user = decoded; 
+
+    // 5. Proceed to the controller (e.g., createBloodRequest or acceptRequest)
+    next();
   } catch (err) {
-    return res.status(401).send({ message: "Invalid token" });
+    console.error("JWT Verification Error:", err.message);
+    return res.status(401).send({ message: "Invalid or expired token" });
   }
 };

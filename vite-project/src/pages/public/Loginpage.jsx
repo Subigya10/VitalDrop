@@ -39,7 +39,7 @@ function LoginPage() {
       // localStorage.setItem("role", res.user.role);
       
       // ← WITH THIS ONE LINE:
-      login(res.access_token, res.user.role);
+      login(res.access_token, res.user.role, res.user.id);
 
       alert("Login successful!");
       console.log(res);

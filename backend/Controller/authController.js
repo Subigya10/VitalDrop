@@ -22,19 +22,22 @@ export const login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: "Password is incorrect" });
 
-    const { password: _, ...userWithoutPassword } = user.toJSON();
-    const token = generateToken({ user: userWithoutPassword });
+    // --- THE FIX: Pass a flat object to the token ---
+    const token = generateToken({ 
+      id: user.userId, // Matches what your request controller expects
+      email: user.email,
+      role: user.role 
+    });
 
-   res.status(200).json({
-  access_token: token,
-  message: "Token generated successfully",
-  user: {
-    userId: user.userId,
-    email: user.email,
-    role: user.role,
-  },
-});
-
+    res.status(200).json({
+      access_token: token,
+      message: "Token generated successfully",
+      user: {
+        id: user.userId,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (e) {
     res.status(500).json({ message: e.message });
   }
