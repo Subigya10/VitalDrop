@@ -2,7 +2,8 @@ import express from "express";
 import { 
   createBloodRequest, 
   getActiveRequests, 
-  acceptRequest 
+  acceptRequest ,
+    getMyRequests 
 } from "../Controller/requestController.js";
 import { verifyToken } from "../Middleware/authmiddleware.js"; // Import it!
 
@@ -15,5 +16,6 @@ router.patch("/accept/:id", verifyToken, acceptRequest);
 
 // KEEP THIS PUBLIC (so anyone can see the need for blood)
 router.get("/all", getActiveRequests);
+router.get("/my", verifyToken, getMyRequests);  // ← ADD
 
 export { router as requestRouter };

@@ -4,6 +4,8 @@ import ProtectedRoute from "./ProtectedRoute"; // ← ADD THIS
 
 const Dashboard = React.lazy(() => import("../pages/private/Dashboard.jsx"));
 const AdminProductPage = React.lazy(() => import("../pages/private/AdminProduct.jsx"));
+const Profile = React.lazy(() => import("../pages/private/Profile.jsx"));
+const Activity = React.lazy(() => import("../pages/private/Activity.jsx"));
 
 const PrivateRoutes = () => {
   return (
@@ -12,6 +14,8 @@ const PrivateRoutes = () => {
         {/* Protected: Anyone logged in can access Dashboard */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/activity" element={<Activity />} />
         </Route>
 
         {/* Protected: Admin only */}

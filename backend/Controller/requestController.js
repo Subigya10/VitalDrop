@@ -66,3 +66,18 @@ export const acceptRequest = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getMyRequests = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const requests = await BloodRequests.findAll({
+      where: [
+        { requesterId: userId },
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
