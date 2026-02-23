@@ -3,7 +3,8 @@ import {
   createBloodRequest, 
   getActiveRequests, 
   acceptRequest ,
-    getMyRequests 
+    getMyRequests ,
+    getDonationCount
 } from "../Controller/requestController.js";
 import { verifyToken } from "../Middleware/authmiddleware.js"; // Import it!
 
@@ -17,5 +18,6 @@ router.patch("/accept/:id", verifyToken, acceptRequest);
 // KEEP THIS PUBLIC (so anyone can see the need for blood)
 router.get("/all", getActiveRequests);
 router.get("/my", verifyToken, getMyRequests);  // ← ADD
+router.get("/donations/count", verifyToken, getDonationCount);
 
 export { router as requestRouter };

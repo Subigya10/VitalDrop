@@ -10,6 +10,7 @@ import {
 import RequestModal from './Requestblood';
 import { useAuth } from '../../context/AuthContext'; // ← ADD
 
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth(); // ← ADD
@@ -17,6 +18,8 @@ const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [requestsData, setRequestsData] = useState([]);
 const [userProfile, setUserProfile] = useState(null);
+const [myRequests, setMyRequests] = useState([]);
+const [livesSaved, setLivesSaved] = useState(0);
   const fetchRequests = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/requests/all');
@@ -29,12 +32,21 @@ const [userProfile, setUserProfile] = useState(null);
   useEffect(() => {
     fetchRequests();
   }, []);
-  useEffect(() => {
+ useEffect(() => {
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("access_token");
+
+  axios.get('http://localhost:5000/api/requests/donations/count', {
+  headers: { Authorization: `Bearer ${token}` }
+}).then(res => setLivesSaved(res.data.count));
+  
   axios.get(`http://localhost:5000/api/users/${userId}`, {
     headers: { Authorization: `Bearer ${token}` }
   }).then(res => setUserProfile(res.data));
+
+  axios.get('http://localhost:5000/api/requests/my', {
+    headers: { Authorization: `Bearer ${token}` }
+  }).then(res => setMyRequests(res.data));
 }, []);
 
   const handleRespond = async (requestId) => {
@@ -146,7 +158,7 @@ const [userProfile, setUserProfile] = useState(null);
               <div className="space-y-4">
                 <h3 className="font-bold text-gray-700">My Status</h3>
                 <div className="flex justify-between text-sm text-gray-500">
-                  Total Donations: <span className="font-bold text-gray-800">3</span>
+                 Total Donations: <span className="font-bold text-gray-800">{myRequests.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600 flex items-center gap-1 font-medium"><CheckCircle size={14}/> Eligible to Donate</span> 
@@ -181,7 +193,7 @@ const [userProfile, setUserProfile] = useState(null);
               <h3 className="font-bold text-gray-800 mb-4">Your Impact</h3>
               <div className="mb-6">
                 <p className="text-xs text-gray-400 font-bold uppercase">Lives Saved</p>
-                <span className="text-4xl font-black text-gray-800">8</span>
+                <span className="text-4xl font-black text-gray-800">{livesSaved}</span>
               </div>
               <div className="space-y-3">
                 <Feedback text="Thank you for saving my brother's life!" />

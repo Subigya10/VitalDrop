@@ -81,3 +81,15 @@ export const getMyRequests = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getDonationCount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const count = await BloodRequests.count({
+      where: { donorId: userId, status: "accepted" }
+    });
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
