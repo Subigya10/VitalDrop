@@ -10,16 +10,19 @@ export const AuthProvider = ({ children }) => {
     return token ? { token, role } : null;
   });
 
-  const login = (token, role,id) => {
+  const login = (token, role,id,name) => {
     localStorage.setItem("access_token", token);
     localStorage.setItem("role", role);
     localStorage.setItem("user_id", id);
-    setUser({ token, role });
+    localStorage.setItem("username", name); 
+    setUser({ token, role, id, name });
   };
 
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("username");
     setUser(null);
   };
 

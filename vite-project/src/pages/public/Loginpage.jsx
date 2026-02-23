@@ -39,7 +39,8 @@ function LoginPage() {
       // localStorage.setItem("role", res.user.role);
       
       // ← WITH THIS ONE LINE:
-      login(res.access_token, res.user.role, res.user.id);
+    // In LoginPage.jsx
+login(res.access_token, res.user.role, res.user.id, res.user.fullName);
 
       alert("Login successful!");
       console.log(res);
