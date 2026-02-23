@@ -4,7 +4,7 @@ export const RegisterSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
 lastName: z.string().optional(),
 
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Enter a valid email address"),
   phone: z.string().min(10, "Phone number is required"),
   password: z
     .string()

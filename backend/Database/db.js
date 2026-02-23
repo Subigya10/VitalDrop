@@ -13,7 +13,7 @@ export const sequelize = new Sequelize(
 
 export const connection = () => {
     try {
-        sequelize.sync(); // automatically creates table based on model
+        sequelize.sync({alter :true}); // automatically creates table based on model
         console.log("Database connected");
     } catch (e) {
         console.log("Database connection failed", e);        

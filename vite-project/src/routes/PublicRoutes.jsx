@@ -12,6 +12,7 @@ const UserLogin =React.lazy(()=>import("../pages/public/Loginpage.jsx"));
 const UserRegister =React.lazy(()=>import("../pages/public/Signuppage.jsx"));
 const Welcomepagee = React.lazy(() => import("../pages/public/Welcomepage.jsx"));
 const ForgotPassword = React.lazy(() => import("../pages/public/Forgotpassword.jsx"));  
+const ResetPassword = React.lazy(() => import("../pages/public/ResetPassword.jsx"));
 
 
 
@@ -34,6 +35,7 @@ const PublicRoutes=()=>{
       <Route path ="/signup" element ={<UserRegister/>}/>
       <Route path ="/login" element ={<UserLogin/>}/>
       <Route path ="/forgotpass" element ={<ForgotPassword/>}/>
+      <Route path ="/reset-password" element ={<ResetPassword/>}/>
       <Route path="*" element={<Navigate to="/" />} />
 
     

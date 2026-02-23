@@ -1,8 +1,9 @@
-import { Users } from "../model/userModel.js";
+import { Users } from "../Model/userModel.js";
 import { generateToken } from "../Security/jwt-utils.js";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { Op } from "sequelize";
 import dotenv from "dotenv";
 dotenv.config(); // load .env variables
 
@@ -86,3 +87,77 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const init = async (req, res) => {
+  try {
+    const user = req.user; // user info from JWT
+    delete user.password;       // hide password
+    res.status(200).send({ data: user, message: "successfully fetched current user" });
+  } catch (e) {
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    console.log("Reset token received:", token);
+    console.log("Password data:", { password, confirmPassword });
+
+    // Validate input
+    if (!token || !password || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    // Find user with valid token
+    const user = await Users.findOne({
+      where: {
+        resetPasswordToken: token,
+        resetPasswordExpires: {
+          [Op.gt]: Date.now(),
+        },
+      },
+    });
+
+    console.log("User found:", user ? "Yes" : "No");
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Update user
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await user.save();
+
+    console.log("Password updated successfully for user:", user.email);
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const authController = { login, init };
+
+

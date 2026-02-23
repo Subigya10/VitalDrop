@@ -1,4 +1,4 @@
-import { Users } from "../model/userModel.js";
+import { Users } from "../Model/userModel.js";
 import bcrypt from "bcryptjs"; // for password hashing
 
 // REGISTER

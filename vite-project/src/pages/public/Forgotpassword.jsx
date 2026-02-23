@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import forgotImg from "../../assets/sleep.jpg";
 import { useApi } from "../../hooks/useAPi";
+import { useNavigate } from "react-router-dom";
 
 
 const ForgotPasswordSchema = z.object({
@@ -18,6 +19,8 @@ const ForgotPassword = () => {
   const { loading, error, callApi } = useApi();
   const [message, setMessage] = useState("");
 
+  const navigate = useNavigate();
+
 
 
 
@@ -27,6 +30,11 @@ const ForgotPassword = () => {
     const res = await callApi("POST", "/auth/forgotpass", {data: { email: data.email }});
 
     setMessage(res?.data?.message || res?.message || "Check your email for a reset link!");
+
+
+       setTimeout(() => {
+      navigate("/reset-password");   // use your actual reset route
+    }, 2000);
   } catch (err) {
     console.error("Forgot password error:", err);
     

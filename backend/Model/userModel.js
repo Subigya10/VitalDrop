@@ -44,11 +44,17 @@ export const Users = sequelize.define("users", {
     type: DataTypes.DATEONLY, 
     allowNull: true 
   },
-
-    role: {
+  role: {
     type: DataTypes.STRING,
     allowNull: false,
-    defaultValue: "user" // <-- all new signups are normal users
-  
+    defaultValue: "user"
+  },
+  resetPasswordToken: {      // ← ADD THIS
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  resetPasswordExpires: {    // ← ADD THIS
+    type: DataTypes.BIGINT,
+    allowNull: true,
   },
 });

@@ -6,6 +6,12 @@ import { productRouter } from "./Routes/productRoutes.js";
 import cors from "cors";
 import { createUploadsFolder } from "./Security/helper.js"; 
 import uploadRouter from "./Routes/uploadRoutes.js";
+import dotenv from "dotenv";
+import { requestRouter } from "./Routes/requestRoute.js";
+dotenv.config(); // Load .env variables
+
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
 
 const app = express();
 
@@ -14,7 +20,7 @@ connection();
 
 // Middlewarea
 app.use(cors({
-  origin: "http://localhost:5173"
+  origin: "http://localhost:5174"
 }));
 
 app.use(express.json());
@@ -24,6 +30,7 @@ app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/file", uploadRouter);
+app.use("/api/requests", requestRouter);
 createUploadsFolder();
 
 

@@ -1,5 +1,6 @@
+// jwt-utils.js
 import jwt from "jsonwebtoken";
 
 export const generateToken = (payload) => {
-  return jwt.sign(payload, "secret-key", { expiresIn: "1h" });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 };

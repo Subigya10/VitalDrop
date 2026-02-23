@@ -6,16 +6,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import LoginSchema from "../../schema/login.schema";
 import { useApi } from "../../hooks/useAPi"; 
 import { Link } from "react-router-dom";
-import {Eye, EyeOff} from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-
-
+import { useAuth } from "../../context/AuthContext"; // ← ADD THIS
 
 function LoginPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);   
-
+  const [showConfirm, setShowConfirm] = useState(false);
+  const { login } = useAuth(); // ← ADD THIS
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(LoginSchema),
@@ -26,19 +25,21 @@ function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const res = await callApi("POST", "/auth/login", {
-        data:{
-        email: data.identifier,
-        password: data.password,
+        data: {
+          email: data.identifier,
+          password: data.password,
         },
       });
 
       console.log("Login response:", res);
-console.log("Role saved in localStorage:", res.user?.role);
+      console.log("Role saved in localStorage:", res.user?.role);
 
-
-      // Save token in localStorage
-      localStorage.setItem("access_token", res.access_token); 
-      localStorage.setItem("role", res.user.role);
+      // ← REPLACE THESE TWO LINES:
+      // localStorage.setItem("access_token", res.access_token); 
+      // localStorage.setItem("role", res.user.role);
+      
+      // ← WITH THIS ONE LINE:
+      login(res.access_token, res.user.role);
 
       alert("Login successful!");
       console.log(res);
@@ -77,25 +78,24 @@ console.log("Role saved in localStorage:", res.user?.role);
             )}
 
             <div className="relative mt-4">
-  <input
-    type={showPassword ? "text" : "password"}
-    placeholder="Password"
-    {...register("password")}
-    className="border rounded px-3 py-2 w-full pr-10"
-  />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                {...register("password")}
+                className="border rounded px-3 py-2 w-full pr-10"
+              />
 
-  <button
-    type="button"
-    onClick={() => setShowPassword(!showPassword)}
-    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
-  >
-    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-  </button>
-</div>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
-           
 
             {/* Remember Me */}
             <div className="flex items-center gap-2 mt-4">
@@ -114,11 +114,12 @@ console.log("Role saved in localStorage:", res.user?.role);
 
             {/* Forgot Password */}
             <p className="text-sm text-center text-red-600 mt-4 cursor-pointer">
-               <Link
-                  to="/forgotpass"  
-                  className="text-black-500 text-sm hover:underline"
-                > Forgot Password?</Link>
-             
+              <Link
+                to="/forgotpass"
+                className="text-black-500 text-sm hover:underline"
+              >
+                Forgot Password?
+              </Link>
             </p>
 
             <p className="text-xs text-center text-gray-400 mt-6">
