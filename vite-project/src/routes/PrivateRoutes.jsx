@@ -10,6 +10,7 @@ const Emergency = React.lazy(() => import("../pages/private/Emergency.jsx"));
 const Nearby = React.lazy(() => import("../pages/private/Nearby.jsx"));
 const Settings = React.lazy(() => import("../pages/private/Settings.jsx"));
 const Donate = React.lazy(() => import("../pages/private/Donate.jsx")); 
+const About = React.lazy(() => import("../pages/public/About.jsx"));
 
 const PrivateRoutes = () => {
   return (
@@ -24,6 +25,7 @@ const PrivateRoutes = () => {
           <Route path="/nearby" element={<Nearby />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/donate" element={<Donate />} />
+          
         </Route>
 
         {/* Protected: Admin only */}

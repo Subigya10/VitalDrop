@@ -16,7 +16,7 @@ console.log("JWT_SECRET:", process.env.JWT_SECRET);
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5177"
+  origin: "http://localhost:5174"
 }));
 
 app.use(express.json());
