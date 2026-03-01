@@ -8,6 +8,7 @@ import { createUploadsFolder } from "./Security/helper.js";
 import uploadRouter from "./Routes/uploadRoutes.js";
 import dotenv from "dotenv";
 import { requestRouter } from "./Routes/requestRoute.js";
+import { donationRouter } from "./Routes/donationRoute.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/file", uploadRouter);
 app.use("/api/requests", requestRouter);
+app.use("/api/donations", donationRouter);
 
 createUploadsFolder();
 
