@@ -25,9 +25,14 @@ export const RegisterSchema = z.object({
   }),
 
   // ── PERSONAL INFO ──
-  gender: z.enum(["Male", "Female", "Other"], {
-    errorMap: () => ({ message: "Please select your gender" }),
-  }),
+ // ✅ Replace with
+gender: z.string().nullable().refine(val => ["Male", "Female", "Other"].includes(val ?? ""), {
+  message: "Please select your gender",
+}),
+
+bloodGroup: z.string().refine(val => ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(val), {
+  message: "Please select your blood group",
+}),
   dateOfBirth: z
     .string()
     .min(1, "Date of birth is required")
@@ -36,10 +41,7 @@ export const RegisterSchema = z.object({
   address: z.string().min(2, "Address is required").max(200, "Address too long"),
 
   // ── MEDICAL INFO ──
-  bloodGroup: z.enum(
-    ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    { errorMap: () => ({ message: "Please select your blood group" }) }
-  ),
+ 
  medicalNotes: z.string().optional(),
 
   // ── PROFILE PHOTO ── optional, just store filename/url
