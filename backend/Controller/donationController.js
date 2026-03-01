@@ -1,4 +1,6 @@
-import {Donation} from '../Model/donationModel.js';
+import { Donation } from '../Model/donationModel.js';
+import { Users } from '../Model/userModel.js';
+import { sequelize } from '../Database/db.js';
 
 export const createDonation = async (req, res) => {
   try {
@@ -34,5 +36,35 @@ export const getMyDonations = async (req, res) => {
     return res.status(200).json(donations);
   } catch (err) {
     return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+export const getLeaderboard = async (req, res) => {
+  try {
+    const [results] = await sequelize.query(`
+      SELECT 
+        u."userId", 
+        u."fullName", 
+        u."bloodGroup",
+        COUNT(d.id) AS "donationCount"
+      FROM "Donations" d
+      JOIN "users" u ON d."userId" = u."userId"
+      GROUP BY u."userId", u."fullName", u."bloodGroup"
+      ORDER BY "donationCount" DESC
+      LIMIT 20
+    `);
+
+    const formatted = results.map(row => ({
+      id: row.userId,
+      fullName: row.fullName,
+      bloodGroup: row.bloodGroup,
+      donationCount: parseInt(row.donationCount),
+    }));
+
+    return res.status(200).json(formatted);
+  } catch (err) {
+    console.error("Leaderboard error:", err.message);
+    return res.status(500).json({ message: err.message });
   }
 };

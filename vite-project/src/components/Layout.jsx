@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, AlertCircle, Heart, MapPin, 
-  History, User, Settings, LogOut, Menu, X 
+  History, User, Settings, LogOut, Menu, X, Search, Trophy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,13 +11,12 @@ const Layout = ({ children }) => {
   const { logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Helper to close menu when a link is clicked on mobile
   const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans">
       
-      {/* MOBILE TOP BAR (Only visible on small screens) */}
+      {/* MOBILE TOP BAR */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 z-30">
         <div className="flex items-center gap-2">
           <Heart size={18} className="text-red-500 fill-red-500" />
@@ -31,12 +30,9 @@ const Layout = ({ children }) => {
         </button>
       </div>
 
-      {/* SIDEBAR OVERLAY (Dim background when menu is open on mobile) */}
+      {/* SIDEBAR OVERLAY */}
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden" 
-          onClick={closeMenu}
-        />
+        <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={closeMenu} />
       )}
 
       {/* SIDEBAR */}
@@ -45,7 +41,7 @@ const Layout = ({ children }) => {
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
         lg:translate-x-0 lg:static lg:h-screen
       `}>
-        {/* Desktop Logo Area */}
+        {/* Desktop Logo */}
         <div className="p-6 mb-4 hidden lg:flex items-center gap-2">
           <div className="w-8 h-8 bg-red-50 rounded-full flex items-center justify-center">
             <Heart size={18} className="text-red-500 fill-red-500" />
@@ -53,18 +49,20 @@ const Layout = ({ children }) => {
           <span className="text-xl font-black text-gray-800 tracking-tight">VitalDrop</span>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 px-4 space-y-1 mt-20 lg:mt-0">
-          <SidebarItem to="/dashboard" icon={<LayoutDashboard size={20}/>} label="Dashboard" onClick={closeMenu} />
-          <SidebarItem to="/emergency" icon={<AlertCircle size={20}/>} label="Emergency" onClick={closeMenu} />
-          <SidebarItem to="/donate" icon={<Heart size={20}/>} label="Donate" onClick={closeMenu} />
-          <SidebarItem to="/nearby" icon={<MapPin size={20}/>} label="Nearby" onClick={closeMenu} />
-          <SidebarItem to="/activity" icon={<History size={20}/>} label="My Activity" onClick={closeMenu} />
-          <SidebarItem to="/profile" icon={<User size={20}/>} label="Profile" onClick={closeMenu} />
-          <SidebarItem to="/settings" icon={<Settings size={20}/>} label="Settings" onClick={closeMenu} />
+        {/* Nav Links */}
+        <nav className="flex-1 px-4 space-y-1 mt-20 lg:mt-0 overflow-y-auto">
+          <SidebarItem to="/dashboard"   icon={<LayoutDashboard size={20}/>} label="Dashboard"   onClick={closeMenu} />
+          <SidebarItem to="/emergency"   icon={<AlertCircle size={20}/>}     label="Emergency"   onClick={closeMenu} />
+          <SidebarItem to="/donate"      icon={<Heart size={20}/>}           label="Donate"      onClick={closeMenu} />
+          <SidebarItem to="/nearby"      icon={<MapPin size={20}/>}          label="Nearby"      onClick={closeMenu} />
+          <SidebarItem to="/donors"      icon={<Search size={20}/>}          label="Find Donors" onClick={closeMenu} />
+          <SidebarItem to="/leaderboard" icon={<Trophy size={20}/>}          label="Leaderboard" onClick={closeMenu} />
+          <SidebarItem to="/activity"    icon={<History size={20}/>}         label="My Activity" onClick={closeMenu} />
+          <SidebarItem to="/profile"     icon={<User size={20}/>}            label="Profile"     onClick={closeMenu} />
+          <SidebarItem to="/settings"    icon={<Settings size={20}/>}        label="Settings"    onClick={closeMenu} />
         </nav>
 
-        {/* Logout Section */}
+        {/* Logout */}
         <div className="p-4 border-t border-gray-50">
           <button 
             onClick={() => { logout(); navigate('/login'); }}
@@ -75,7 +73,7 @@ const Layout = ({ children }) => {
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <div className="p-4 sm:p-6 lg:p-8 mt-16 lg:mt-0">
           {children}
@@ -85,7 +83,6 @@ const Layout = ({ children }) => {
   );
 };
 
-// Updated SidebarItem to handle click events (closing the menu)
 const SidebarItem = ({ icon, label, to, onClick }) => (
   <NavLink 
     to={to} 

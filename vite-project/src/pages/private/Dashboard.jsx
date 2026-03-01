@@ -4,10 +4,12 @@ import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import { 
   LayoutDashboard, AlertCircle, Heart, MapPin, 
-  History, Trophy, User, Settings, LogOut,
-  PlusCircle, Users, Bell, Award, CheckCircle, Menu, X 
+  History, User, Settings, LogOut,
+  PlusCircle, Users, Bell, Award, CheckCircle, Menu, X, Search, Trophy
 } from 'lucide-react';
 import RequestModal from './Requestblood';
+import RequestDetailModal from '../../components/RequestDetailModal';
+import BloodStatsWidget from '../../components/Bloodstatswidget';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -17,6 +19,7 @@ const Dashboard = () => {
   const username = localStorage.getItem("username") || "User";
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null); // for detail modal
   const [requestsData, setRequestsData] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [myRequests, setMyRequests] = useState([]);
@@ -71,7 +74,18 @@ const Dashboard = () => {
 
   const columns = [
     { name: 'Date', selector: row => new Date(row.createdAt).toLocaleDateString(), sortable: true, hide: 'sm' },
-    { name: 'Patient', selector: row => row.patientName, sortable: true },
+    { 
+      name: 'Patient', 
+      cell: row => (
+        <button
+          className="font-semibold text-gray-800 hover:text-red-500 transition text-left text-sm"
+          onClick={() => setSelectedRequest(row)}
+        >
+          {row.patientName}
+        </button>
+      ),
+      sortable: true 
+    },
     { name: 'Location', selector: row => row.hospitalLocation, hide: 'md' },
     { name: 'Group', selector: row => row.bloodGroup, width: '70px', center: "true" },
     { name: 'Units', selector: row => row.unitsNeeded, center: "true", width: '70px', hide: 'sm' },
@@ -95,17 +109,14 @@ const Dashboard = () => {
   const customStyles = {
     headCells: { style: { fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' } },
     cells: { style: { padding: '8px' } },
+    rows: { style: { cursor: 'pointer' } },
   };
 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans relative">
       
-      {/* MOBILE OVERLAY */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-30 lg:hidden" 
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black/20 z-30 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
       {/* SIDEBAR */}
@@ -126,13 +137,15 @@ const Dashboard = () => {
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-          <SidebarItem to="/dashboard" icon={<LayoutDashboard size={20}/>} label="Dashboard" />
-          <SidebarItem to="/emergency" icon={<AlertCircle size={20}/>} label="Emergency" color="text-red-500" />
-          <SidebarItem to="/donate" icon={<Heart size={20}/>} label="Donate" />
-          <SidebarItem to="/nearby" icon={<MapPin size={20}/>} label="Nearby" />
-          <SidebarItem to="/activity" icon={<History size={20}/>} label="My Activity" />
-          <SidebarItem to="/profile" icon={<User size={20}/>} label="Profile" />
-          <SidebarItem to="/settings" icon={<Settings size={20}/>} label="Settings" />
+          <SidebarItem to="/dashboard"   icon={<LayoutDashboard size={20}/>} label="Dashboard" />
+          <SidebarItem to="/emergency"   icon={<AlertCircle size={20}/>}     label="Emergency"   color="text-red-500" />
+          <SidebarItem to="/donate"      icon={<Heart size={20}/>}           label="Donate" />
+          <SidebarItem to="/nearby"      icon={<MapPin size={20}/>}          label="Nearby" />
+          <SidebarItem to="/donors"      icon={<Search size={20}/>}          label="Find Donors" />
+          <SidebarItem to="/leaderboard" icon={<Trophy size={20}/>}          label="Leaderboard" />
+          <SidebarItem to="/activity"    icon={<History size={20}/>}         label="My Activity" />
+          <SidebarItem to="/profile"     icon={<User size={20}/>}            label="Profile" />
+          <SidebarItem to="/settings"    icon={<Settings size={20}/>}        label="Settings" />
         </nav>
 
         <div className="p-4 border-t border-gray-50">
@@ -160,7 +173,6 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center justify-between md:justify-end gap-4">
-            {/* Urgent bell → goes to /emergency */}
             <button
               onClick={() => navigate('/emergency')}
               className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-200 text-xs md:text-sm hover:bg-red-700 transition active:scale-95"
@@ -172,7 +184,6 @@ const Dashboard = () => {
               <div
                 className="w-9 h-9 bg-red-100 rounded-full border-2 border-white shadow-sm overflow-hidden cursor-pointer"
                 onClick={() => navigate('/profile')}
-                title="Go to Profile"
               >
                 <img src={`https://ui-avatars.com/api/?name=${userProfile?.fullName || username}&background=f87171&color=fff`} alt="user" />
               </div>
@@ -188,30 +199,10 @@ const Dashboard = () => {
             
             {/* ACTION BUTTONS */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-              <CardBtn
-                icon={<PlusCircle size={24}/>}
-                label="Request Blood"
-                color="bg-red-500"
-                onClick={() => setIsModalOpen(true)}
-              />
-              <CardBtn
-                icon={<Heart size={24}/>}
-                label="Donate Blood"
-                color="bg-teal-500"
-                onClick={() => navigate('/donate')}
-              />
-              <CardBtn
-                icon={<MapPin size={24}/>}
-                label="Nearby Requests"
-                color="bg-orange-400"
-                onClick={() => navigate('/nearby')}
-              />
-              <CardBtn
-                icon={<Users size={24}/>}
-                label="Become Volunteer"
-                color="bg-blue-500"
-                onClick={() => navigate('/activity')}
-              />
+              <CardBtn icon={<PlusCircle size={24}/>} label="Request Blood"    color="bg-red-500"    onClick={() => setIsModalOpen(true)} />
+              <CardBtn icon={<Heart size={24}/>}      label="Donate Blood"     color="bg-teal-500"   onClick={() => navigate('/donate')} />
+              <CardBtn icon={<MapPin size={24}/>}     label="Nearby Requests"  color="bg-orange-400" onClick={() => navigate('/nearby')} />
+              <CardBtn icon={<Search size={24}/>}     label="Find Donors"      color="bg-blue-500"   onClick={() => navigate('/donors')} />
             </div>
 
             {/* STATUS CARDS */}
@@ -225,7 +216,6 @@ const Dashboard = () => {
                   <span className="text-green-600 flex items-center gap-1 font-medium"><CheckCircle size={14}/> Eligible</span> 
                   <span className="font-bold text-green-600">Yes</span>
                 </div>
-                {/* Donate Now → /donate */}
                 <button
                   onClick={() => navigate('/donate')}
                   className="w-full bg-red-500 text-white py-2 rounded-lg font-bold mt-2 hover:bg-red-600 transition shadow-md active:scale-95"
@@ -243,14 +233,16 @@ const Dashboard = () => {
 
             {/* TABLE */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-5 border-b border-gray-50">
+              <div className="p-5 border-b border-gray-50 flex items-center justify-between">
                 <h2 className="font-bold text-gray-800 text-sm md:text-base">Urgent Blood Requests</h2>
+                <span className="text-[10px] text-gray-400">Click a name for details</span>
               </div>
               <div className="overflow-x-auto">
                 <DataTable 
                   columns={columns} 
                   data={requestsData} 
-                  customStyles={customStyles} 
+                  customStyles={customStyles}
+                  onRowClicked={(row) => setSelectedRequest(row)}
                   highlightOnHover 
                   responsive
                   noDataComponent={<div className="p-10 text-gray-400 text-sm">No pending requests found.</div>}
@@ -259,25 +251,37 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* RIGHT SECTION (IMPACT) */}
-          <div className="col-span-12 lg:col-span-3">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-8">
+          {/* RIGHT SECTION */}
+          <div className="col-span-12 lg:col-span-3 space-y-6">
+
+            {/* BLOOD STATS WIDGET */}
+            <BloodStatsWidget />
+
+            {/* IMPACT CARD */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
               <h3 className="font-bold text-gray-800 mb-4">Your Impact</h3>
-              <div className="mb-6 flex flex-row lg:flex-col justify-between items-end lg:items-start">
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase">Lives Saved</p>
-                  <span className="text-4xl font-black text-gray-800">{livesSaved}</span>
-                </div>
+              <div className="mb-6">
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Lives Saved</p>
+                {livesSaved === 0
+                  ? <p className="text-sm text-gray-300 mt-1">Donate to start saving lives!</p>
+                  : <span className="text-4xl font-black text-gray-800">{livesSaved}</span>
+                }
               </div>
               <div className="space-y-3">
                 <Feedback text="Thank you for saving my brother's life!" />
                 <Feedback text="We are forever grateful!" />
               </div>
-              <div className="mt-8 pt-6 border-t flex justify-around">
+              <div className="mt-6 pt-4 border-t flex justify-around">
                 <Badge color="#f87171" label="Hero" />
                 <Badge color="#60a5fa" label="Active" />
                 <Badge color="#fbbf24" label="Elite" />
               </div>
+              <button
+                onClick={() => navigate('/leaderboard')}
+                className="w-full mt-4 border border-gray-200 text-gray-500 py-2 rounded-xl text-xs font-bold hover:border-yellow-300 hover:text-yellow-600 transition"
+              >
+                🏆 View Leaderboard
+              </button>
             </div>
           </div>
         </div>
@@ -288,11 +292,19 @@ const Dashboard = () => {
         onClose={() => setIsModalOpen(false)} 
         onRefresh={fetchRequests}
       />
+
+      {/* REQUEST DETAIL MODAL */}
+      {selectedRequest && (
+        <RequestDetailModal
+          request={selectedRequest}
+          onClose={() => setSelectedRequest(null)}
+          onRespond={handleRespond}
+        />
+      )}
     </div>
   );
 };
 
-// HELPER COMPONENTS
 const SidebarItem = ({ icon, label, to, color }) => (
   <NavLink to={to} className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive ? 'bg-red-50 text-red-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'} ${color}`}>
     {icon} {label}

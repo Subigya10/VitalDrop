@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import ProtectedRoute from "./ProtectedRoute"; // ← ADD THIS
+import ProtectedRoute from "./ProtectedRoute";
 
 const Dashboard = React.lazy(() => import("../pages/private/Dashboard.jsx"));
 const AdminProductPage = React.lazy(() => import("../pages/private/AdminProduct.jsx"));
@@ -9,18 +9,20 @@ const Activity = React.lazy(() => import("../pages/private/Activity.jsx"));
 const Emergency = React.lazy(() => import("../pages/private/Emergency.jsx"));
 const Nearby = React.lazy(() => import("../pages/private/Nearby.jsx"));
 const Settings = React.lazy(() => import("../pages/private/Settings.jsx"));
-const Donate = React.lazy(() => import("../pages/private/Donate.jsx")); 
+const Donate = React.lazy(() => import("../pages/private/Donate.jsx"));
+const DonorSearch = React.lazy(() => import("../pages/private/DonorSearch.jsx"));
+const Leaderboard = React.lazy(() => import("../pages/private/Leaderboard.jsx"));
 const About = React.lazy(() => import("../pages/public/About.jsx"));
 
 const PrivateRoutes = () => {
   return (
     <Suspense fallback={
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-  </div>
-}>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
       <Routes>
-        {/* Protected: Anyone logged in can access Dashboard */}
+        {/* Protected: Anyone logged in */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
@@ -29,7 +31,8 @@ const PrivateRoutes = () => {
           <Route path="/nearby" element={<Nearby />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/donate" element={<Donate />} />
-          
+          <Route path="/donors" element={<DonorSearch />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
         </Route>
 
         {/* Protected: Admin only */}
