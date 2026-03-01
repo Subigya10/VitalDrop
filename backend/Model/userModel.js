@@ -36,9 +36,9 @@ export const Users = sequelize.define("users", {
     type: DataTypes.STRING, 
     allowNull: true 
   },
-  medicalHistory: { 
-    type: DataTypes.STRING, 
-    allowNull: true 
+ medicalHistory: {
+  type: DataTypes.TEXT,
+  allowNull: true,
   },
   dateOfBirth: { 
     type: DataTypes.DATEONLY, 
@@ -57,4 +57,9 @@ export const Users = sequelize.define("users", {
     type: DataTypes.BIGINT,
     allowNull: true,
   },
+  profilePhoto: {
+  type: DataTypes.STRING,  // stores the image URL/path
+  allowNull: true,
+  defaultValue: null,
+},
 });

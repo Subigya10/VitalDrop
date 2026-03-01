@@ -14,11 +14,12 @@ export const apiRequest = async (method, endpoint, options = {}) => {
       url: `${BASE_URL}${endpoint}`,
       data,
       params,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...headers,
-      },
+     // NEW ✅
+headers: {
+  ...(data instanceof FormData ? {} : { "Content-Type": "application/json" }),
+  ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  ...headers,
+},
     });
     return response.data;
   } catch (error) {

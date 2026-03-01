@@ -5,6 +5,8 @@ import { Op } from "sequelize";
 // REGISTER
 export const register = async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
     const {
       fullName,
       email,
@@ -25,6 +27,12 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // medicalHistory is already a plain string from the frontend (no parsing needed)
+    const plainHistory = medicalHistory || "";
+
+    // profilePhoto path comes from multer
+    const profilePhoto = req.file ? req.file.path : null;
+
     const user = await Users.create({
       fullName,
       email,
@@ -33,8 +41,9 @@ export const register = async (req, res) => {
       address,
       gender,
       bloodGroup,
-      medicalHistory,
+      medicalHistory: plainHistory,
       dateOfBirth,
+      profilePhoto,
       role: "user",
     });
 
@@ -98,7 +107,7 @@ export const deleteById = async (req, res) => {
   }
 };
 
-// GET ALL DONORS (users with a blood group set)
+// GET ALL DONORS
 export const getDonors = async (req, res) => {
   try {
     const donors = await Users.findAll({
