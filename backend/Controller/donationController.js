@@ -24,3 +24,15 @@ export const createDonation = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getMyDonations = async (req, res) => {
+  try {
+    const donations = await Donation.findAll({
+      where: { userId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    });
+    return res.status(200).json(donations);
+  } catch (err) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
