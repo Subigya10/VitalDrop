@@ -6,7 +6,8 @@ import {
   getMyRequests,
   getDonationCount,
   getAllRequests,
-  updateRequestStatus
+  updateRequestStatus,
+  deleteRequest
 } from "../Controller/requestController.js";
 import { verifyToken } from "../Middleware/authmiddleware.js";
 
@@ -19,5 +20,6 @@ router.get("/donations/count", verifyToken, getDonationCount);
 router.post("/", verifyToken, createBloodRequest);
 router.patch("/accept/:id", verifyToken, acceptRequest);
 router.patch("/:id", verifyToken, updateRequestStatus); // Admin: update status
+router.delete('/:id', verifyToken, deleteRequest);
 
 export { router as requestRouter };
