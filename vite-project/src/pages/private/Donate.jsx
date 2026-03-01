@@ -1,33 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { DonateSchema } from '../../schema/donate.schema';
 import { Heart, CheckCircle } from 'lucide-react';
 import Layout from '../../components/Layout';
-import toast from 'react-hot-toast'; // Added toast
+import toast from 'react-hot-toast';
 
 const Donate = () => {
-  const [form, setForm] = useState({
-    donorName: '',
-    bloodGroup: '',
-    phone: '',
-    hospital: '',
-    date: '',
-    message: '',
-  });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [successData, setSuccessData] = useState(null);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(DonateSchema),
+  });
 
-  const handleSubmit = () => {
-    if (!form.donorName || !form.bloodGroup || !form.phone || !form.hospital || !form.date) {
-      toast.error("Please fill in all required fields!"); // Replaced alert
-      return;
+  // Pre-fill name, blood group, phone from user profile
+  useEffect(() => {
+    const userId = localStorage.getItem("user_id");
+    const token = localStorage.getItem("access_token");
+    axios.get(`http://localhost:5000/api/users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+      if (res.data.fullName)    setValue("donorName", res.data.fullName);
+      if (res.data.bloodGroup)  setValue("bloodGroup", res.data.bloodGroup);
+      if (res.data.phoneNumber) setValue("phone", res.data.phoneNumber);
+    }).catch(() => {});
+  }, [setValue]);
+
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("access_token");
+      await axios.post('http://localhost:5000/api/donations', data, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSuccessData(data);
+      setSubmitted(true);
+      toast.success("Donation scheduled! You're a hero 🩸");
+    } catch (err) {
+      if (err.response?.status === 400) {
+        toast.error(err.response.data.message || "Invalid donation details!");
+      } else {
+        toast.error("Failed to schedule donation. Try again!");
+      }
+    } finally {
+      setLoading(false);
     }
-    setSubmitted(true);
-    toast.success("Donation scheduled successfully!"); // Added success toast
   };
 
-  if (submitted) {
+  // Success screen
+  if (submitted && successData) {
     return (
       <Layout>
         <div className="max-w-xl mx-auto text-center py-10 md:py-20 px-4">
@@ -35,15 +65,32 @@ const Donate = () => {
             <CheckCircle size={40} className="text-green-500" />
           </div>
           <h1 className="text-xl md:text-2xl font-black text-gray-800 mb-2">Thank You! 🩸</h1>
-          <p className="text-sm md:text-gray-400 mb-8">Your donation has been scheduled. You're a hero!</p>
-          <button onClick={() => setSubmitted(false)}
-            className="w-full md:w-auto bg-red-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition">
+          <p className="text-sm text-gray-400 mb-2">Your donation has been scheduled.</p>
+          <p className="text-xs text-gray-300 mb-8">
+            📅 {new Date(successData.date).toDateString()} &nbsp;·&nbsp; 🏥 {successData.hospital}
+          </p>
+          <button
+            onClick={() => {
+              setSubmitted(false);
+              setSuccessData(null);
+              reset({
+                donorName: successData.donorName,
+                bloodGroup: successData.bloodGroup,
+                phone: successData.phone,
+                hospital: '',
+                date: '',
+                message: '',
+              });
+            }}
+            className="w-full md:w-auto bg-red-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition shadow-md active:scale-95">
             Donate Again
           </button>
         </div>
       </Layout>
     );
   }
+
+  const todayStr = new Date().toISOString().split('T')[0];
 
   return (
     <Layout>
@@ -54,65 +101,124 @@ const Donate = () => {
             <Heart size={20} className="text-red-500 fill-red-200" />
           </div>
           <div>
-            <h1 className="text-xl md:text-2xl font-black text-gray-800 uppercase sm:normal-case">Donate Blood</h1>
+            <h1 className="text-xl md:text-2xl font-black text-gray-800">Donate Blood</h1>
             <p className="text-xs md:text-sm text-gray-400">Schedule your blood donation</p>
           </div>
         </div>
 
-        {/* Card - Reduced padding on mobile */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-8 space-y-4 md:space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-8 space-y-4 md:space-y-5">
 
-          {/* Grid becomes 1 column on mobile, 2 columns on small tablets up */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Full Name *</label>
-              <input name="donorName" value={form.donorName} onChange={handleChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400" />
+            {/* Row 1 - Name + Blood Group */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                  Full Name *
+                </label>
+                <input
+                  {...register("donorName")}
+                  placeholder="Your full name"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
+                />
+                {errors.donorName && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.donorName.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                  Blood Group *
+                </label>
+                <select
+                  {...register("bloodGroup")}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 bg-white"
+                >
+                  <option value="">Select</option>
+                  {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+                {errors.bloodGroup && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.bloodGroup.message}</p>
+                )}
+              </div>
             </div>
-            <div>
-              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Blood Group *</label>
-              <select name="bloodGroup" value={form.bloodGroup} onChange={handleChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 bg-white">
-                <option value="">Select</option>
-                {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(g => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
+
+            {/* Row 2 - Phone + Date */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                  Phone *
+                </label>
+                <input
+                  {...register("phone")}
+                  placeholder="e.g. 9841234567"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
+                />
+                {errors.phone && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.phone.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                  Preferred Date *
+                </label>
+                <input
+                  type="date"
+                  {...register("date")}
+                  min={todayStr}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
+                />
+                {errors.date && (
+                  <p className="text-red-500 text-[10px] mt-1">{errors.date.message}</p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Hospital */}
             <div>
-              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Phone *</label>
-              <input name="phone" value={form.phone} onChange={handleChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400" />
+              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                Hospital *
+              </label>
+              <input
+                {...register("hospital")}
+                placeholder="e.g. Patan Hospital, Kathmandu"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
+              />
+              {errors.hospital && (
+                <p className="text-red-500 text-[10px] mt-1">{errors.hospital.message}</p>
+              )}
             </div>
+
+            {/* Message */}
             <div>
-              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Preferred Date *</label>
-              <input type="date" name="date" value={form.date} onChange={handleChange}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400" />
+              <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block tracking-wider">
+                Message (optional)
+              </label>
+              <textarea
+                {...register("message")}
+                rows={3}
+                placeholder="Any additional info for the hospital..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 resize-none transition-all"
+              />
+              {errors.message && (
+                <p className="text-red-500 text-[10px] mt-1">{errors.message.message}</p>
+              )}
             </div>
-          </div>
 
-          <div>
-            <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Hospital *</label>
-            <input name="hospital" value={form.hospital} onChange={handleChange}
-              placeholder="e.g. Patan Hospital"
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400" />
-          </div>
+            {/* Submit button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white py-3 md:py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-md active:scale-95"
+            >
+              <Heart size={18} />
+              {loading ? "Scheduling..." : "Schedule Donation"}
+            </button>
 
-          <div>
-            <label className="text-[10px] md:text-xs font-bold text-gray-500 uppercase mb-1 block">Message (optional)</label>
-            <textarea name="message" value={form.message} onChange={handleChange} rows={3}
-              placeholder="Any additional info..."
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-400 resize-none" />
           </div>
-
-          <button onClick={handleSubmit}
-            className="w-full bg-red-500 hover:bg-red-600 text-white py-3 md:py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition shadow-md active:scale-95">
-            <Heart size={18} /> Schedule Donation
-          </button>
-        </div>
+        </form>
       </div>
     </Layout>
   );
