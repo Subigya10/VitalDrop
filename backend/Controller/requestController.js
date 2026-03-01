@@ -93,3 +93,37 @@ export const getDonationCount = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Admin: get ALL requests
+export const getAllRequests = async (req, res) => {
+  try {
+    const requests = await BloodRequests.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Admin: update request status
+export const updateRequestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const request = await BloodRequests.findByPk(id);
+    if (!request) return res.status(404).json({ message: 'Request not found' });
+    await request.update({ status });
+    res.status(200).json(request);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+export const deleteRequest = async (req, res) => {
+  try {
+    const request = await BloodRequests.findByPk(req.params.id);
+    if (!request) return res.status(404).json({ message: 'Not found' });
+    await request.destroy();
+    res.status(200).json({ message: 'Deleted' });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};

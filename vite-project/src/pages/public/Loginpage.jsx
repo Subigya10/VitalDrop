@@ -35,7 +35,7 @@ function LoginPage() {
       login(res.access_token, res.user.role, res.user.id, res.user.fullName);
 
       toast.success("Login successful!"); // 2. Replaced alert
-      navigate("/dashboard");
+      navigate(res.user.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
       console.error("Login error:", err.message);
       toast.error(err.response?.data?.message || "Login failed"); // 3. Replaced alert

@@ -2,23 +2,22 @@ import express from "express";
 import { 
   createBloodRequest, 
   getActiveRequests, 
-  acceptRequest ,
-    getMyRequests ,
-    getDonationCount
+  acceptRequest,
+  getMyRequests,
+  getDonationCount,
+  getAllRequests,
+  updateRequestStatus
 } from "../Controller/requestController.js";
-import { verifyToken } from "../Middleware/authmiddleware.js"; // Import it!
-
+import { verifyToken } from "../Middleware/authmiddleware.js";
 
 const router = express.Router();
 
-// PROTECT THESE ROUTES
-// This ensures req.user.id is available in your controllers
-router.post("/", verifyToken, createBloodRequest); 
-router.patch("/accept/:id", verifyToken, acceptRequest);
-
-// KEEP THIS PUBLIC (so anyone can see the need for blood)
-router.get("/all", getActiveRequests);
-router.get("/my", verifyToken, getMyRequests);  // ← ADD
+router.get("/", verifyToken, getAllRequests);          // Admin: all requests
+router.get("/all", getActiveRequests);                 // Public: pending only
+router.get("/my", verifyToken, getMyRequests);
 router.get("/donations/count", verifyToken, getDonationCount);
+router.post("/", verifyToken, createBloodRequest);
+router.patch("/accept/:id", verifyToken, acceptRequest);
+router.patch("/:id", verifyToken, updateRequestStatus); // Admin: update status
 
 export { router as requestRouter };

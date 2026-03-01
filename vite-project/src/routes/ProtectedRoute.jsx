@@ -1,22 +1,18 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const ProtectedRoute = ({ allowedRoles }) => {
+const ProtectedRoute = ({ allowedRoles, adminFallback }) => {
   const { user } = useAuth();
+  const role = user?.role || localStorage.getItem("role");
 
-  console.log("🔒 ProtectedRoute checking user:", user); // ← ADD THIS
+  if (!user) return <Navigate to="/login" replace />;
 
-  if (!user) {
-    console.log("❌ No user found, redirecting to login"); // ← ADD THIS
-    return <Navigate to="/login" replace />;
+  if (adminFallback && role === "admin") return <Navigate to={adminFallback} replace />;
+
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to={role === "admin" ? "/admin" : "/dashboard"} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    console.log("❌ Wrong role, redirecting to dashboard"); // ← ADD THIS
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  console.log("✅ User authorized, showing page"); // ← ADD THIS
   return <Outlet />;
 };
 

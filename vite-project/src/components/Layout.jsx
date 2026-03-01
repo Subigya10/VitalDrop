@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, AlertCircle, Heart, MapPin, 
-  History, User, Settings, LogOut, Menu, X, Search, Trophy
+  History, User, Settings, LogOut, Menu, X, Search, Trophy, ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Layout = ({ children }) => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const closeMenu = () => setIsMobileMenuOpen(false);
@@ -60,6 +60,11 @@ const Layout = ({ children }) => {
           <SidebarItem to="/activity"    icon={<History size={20}/>}         label="My Activity" onClick={closeMenu} />
           <SidebarItem to="/profile"     icon={<User size={20}/>}            label="Profile"     onClick={closeMenu} />
           <SidebarItem to="/settings"    icon={<Settings size={20}/>}        label="Settings"    onClick={closeMenu} />
+          
+          {/* Admin only */}
+          {localStorage.getItem('role') === 'admin' && (
+            <SidebarItem to="/admin" icon={<ShieldCheck size={20}/>} label="Admin" onClick={closeMenu} admin />
+          )}
         </nav>
 
         {/* Logout */}
@@ -83,13 +88,15 @@ const Layout = ({ children }) => {
   );
 };
 
-const SidebarItem = ({ icon, label, to, onClick }) => (
+const SidebarItem = ({ icon, label, to, onClick, admin }) => (
   <NavLink 
     to={to} 
     onClick={onClick}
     className={({isActive}) => `
       flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all 
-      ${isActive ? 'bg-red-50 text-red-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}
+      ${isActive 
+        ? admin ? 'bg-purple-50 text-purple-600 shadow-sm' : 'bg-red-50 text-red-600 shadow-sm'
+        : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}
     `}
   >
     {icon} {label}
