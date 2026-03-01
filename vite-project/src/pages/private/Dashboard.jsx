@@ -16,7 +16,7 @@ const Dashboard = () => {
   const { logout } = useAuth();
   const username = localStorage.getItem("username") || "User";
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [requestsData, setRequestsData] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
   const [myRequests, setMyRequests] = useState([]);
@@ -160,12 +160,20 @@ const Dashboard = () => {
           </div>
           
           <div className="flex items-center justify-between md:justify-end gap-4">
-            <button className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-200 text-xs md:text-sm">
+            {/* Urgent bell → goes to /emergency */}
+            <button
+              onClick={() => navigate('/emergency')}
+              className="bg-red-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-red-200 text-xs md:text-sm hover:bg-red-700 transition active:scale-95"
+            >
               <Bell size={16} className="animate-pulse" /> Urgent
             </button>
             <div className="flex items-center gap-2 border-l pl-4">
               <span className="hidden sm:inline text-xs font-bold text-gray-600 uppercase">{userProfile?.fullName || username}</span>
-              <div className="w-9 h-9 bg-red-100 rounded-full border-2 border-white shadow-sm overflow-hidden">
+              <div
+                className="w-9 h-9 bg-red-100 rounded-full border-2 border-white shadow-sm overflow-hidden cursor-pointer"
+                onClick={() => navigate('/profile')}
+                title="Go to Profile"
+              >
                 <img src={`https://ui-avatars.com/api/?name=${userProfile?.fullName || username}&background=f87171&color=fff`} alt="user" />
               </div>
             </div>
@@ -180,10 +188,30 @@ const Dashboard = () => {
             
             {/* ACTION BUTTONS */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-              <CardBtn icon={<PlusCircle size={24}/>} label="Request Blood" color="bg-red-500" onClick={() => setIsModalOpen(true)} />
-              <CardBtn icon={<Heart size={24}/>} label="Donate Blood" color="bg-teal-500" />
-              <CardBtn icon={<MapPin size={24}/>} label="Nearby Requests" color="bg-orange-400" />
-              <CardBtn icon={<Users size={24}/>} label="Become Volunteer" color="bg-blue-500" />
+              <CardBtn
+                icon={<PlusCircle size={24}/>}
+                label="Request Blood"
+                color="bg-red-500"
+                onClick={() => setIsModalOpen(true)}
+              />
+              <CardBtn
+                icon={<Heart size={24}/>}
+                label="Donate Blood"
+                color="bg-teal-500"
+                onClick={() => navigate('/donate')}
+              />
+              <CardBtn
+                icon={<MapPin size={24}/>}
+                label="Nearby Requests"
+                color="bg-orange-400"
+                onClick={() => navigate('/nearby')}
+              />
+              <CardBtn
+                icon={<Users size={24}/>}
+                label="Become Volunteer"
+                color="bg-blue-500"
+                onClick={() => navigate('/activity')}
+              />
             </div>
 
             {/* STATUS CARDS */}
@@ -191,13 +219,19 @@ const Dashboard = () => {
               <div className="space-y-4">
                 <h3 className="font-bold text-gray-700">My Status</h3>
                 <div className="flex justify-between text-sm text-gray-500">
-                  Total Donations: <span className="font-bold text-gray-800">{myRequests.length}</span>
+                  Total Requests: <span className="font-bold text-gray-800">{myRequests.length}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-green-600 flex items-center gap-1 font-medium"><CheckCircle size={14}/> Eligible</span> 
                   <span className="font-bold text-green-600">Yes</span>
                 </div>
-                <button className="w-full bg-red-500 text-white py-2 rounded-lg font-bold mt-2 hover:bg-red-600 transition shadow-md">Donate Now</button>
+                {/* Donate Now → /donate */}
+                <button
+                  onClick={() => navigate('/donate')}
+                  className="w-full bg-red-500 text-white py-2 rounded-lg font-bold mt-2 hover:bg-red-600 transition shadow-md active:scale-95"
+                >
+                  Donate Now
+                </button>
               </div>
               <div className="bg-gray-50 py-6 rounded-xl flex flex-col items-center justify-center border border-gray-100">
                 <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Your Group</span>
@@ -258,7 +292,7 @@ const Dashboard = () => {
   );
 };
 
-// HELPER COMPONENTS PRESERVED WITH RESPONSIVE CLASSES
+// HELPER COMPONENTS
 const SidebarItem = ({ icon, label, to, color }) => (
   <NavLink to={to} className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive ? 'bg-red-50 text-red-600 shadow-sm' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'} ${color}`}>
     {icon} {label}

@@ -14,7 +14,11 @@ const About = React.lazy(() => import("../pages/public/About.jsx"));
 
 const PrivateRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+  </div>
+}>
       <Routes>
         {/* Protected: Anyone logged in can access Dashboard */}
         <Route element={<ProtectedRoute />}>

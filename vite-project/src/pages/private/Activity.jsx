@@ -3,6 +3,7 @@ import axios from 'axios';
 import { History, Droplets, Heart } from 'lucide-react';
 import Layout from '../../components/Layout.jsx';
 import toast from 'react-hot-toast';
+import { SkeletonList } from '../../components/SkeletonCard';
 
 const Activity = () => {
   const [tab, setTab] = useState('requests');
@@ -64,7 +65,7 @@ const Activity = () => {
         </div>
 
         {loading ? (
-          <div className="text-center text-gray-400 py-10 md:py-20 animate-pulse">Loading history...</div>
+  <SkeletonList count={4} />
         ) : tab === 'requests' ? (
 
           // ── MY REQUESTS TAB ──
