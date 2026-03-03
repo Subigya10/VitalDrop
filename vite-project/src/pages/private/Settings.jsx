@@ -33,7 +33,7 @@ const SettingsPage = () => {
     formState: { errors: emailErrors },
   } = useForm({
     resolver: zodResolver(EmailSchema),
-    defaultValues: { email: localStorage.getItem("username") || "" },
+    defaultValues: { email: localStorage.getItem("email") || "" },
   });
 
   const {
