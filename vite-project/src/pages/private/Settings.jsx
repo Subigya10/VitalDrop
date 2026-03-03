@@ -1,52 +1,79 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Settings, Lock, Mail, Bell, Moon, Trash2 } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Settings, Lock, Mail, Bell, Trash2 } from 'lucide-react';
 import Layout from '../../components/Layout';
 import toast from 'react-hot-toast';
 
+const EmailSchema = z.object({
+  email: z.string().min(1, 'Please enter your email').email('Invalid email address'),
+});
+
+const PasswordSchema = z.object({
+  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string().min(1, 'Please confirm your password'),
+}).refine(data => data.newPassword === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
+});
+
 const SettingsPage = () => {
-  const [email, setEmail] = useState(localStorage.getItem("username") || "");
-  const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
   const [notifications, setNotifications] = useState(true);
-  const [loading, setLoading] = useState('');
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
 
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("access_token");
 
-  const handleEmailUpdate = async () => {
+  const {
+    register: registerEmail,
+    handleSubmit: handleEmailSubmit,
+    formState: { errors: emailErrors },
+  } = useForm({
+    resolver: zodResolver(EmailSchema),
+    defaultValues: { email: localStorage.getItem("username") || "" },
+  });
+
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+    formState: { errors: passwordErrors },
+  } = useForm({
+    resolver: zodResolver(PasswordSchema),
+    defaultValues: { newPassword: '', confirmPassword: '' },
+  });
+
+  const onEmailUpdate = async (data) => {
     try {
-      setLoading('email');
-      await axios.patch(`http://localhost:5000/api/users/${userId}`, 
-        { email },
+      setLoadingEmail(true);
+      await axios.patch(`http://localhost:5000/api/users/${userId}`,
+        { email: data.email },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Email updated successfully!");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update email!");
     } finally {
-      setLoading('');
+      setLoadingEmail(false);
     }
   };
 
-  const handlePasswordUpdate = async () => {
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error("Passwords don't match!"); return;
-    }
-    if (passwords.newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters!"); return;
-    }
+  const onPasswordUpdate = async (data) => {
     try {
-      setLoading('password');
+      setLoadingPassword(true);
       await axios.patch(`http://localhost:5000/api/users/${userId}`,
-        { password: passwords.newPassword },
+        { password: data.newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPasswords({ newPassword: '', confirmPassword: '' });
+      resetPassword();
       toast.success("Password updated successfully!");
-    } catch (err) {
+    } catch {
       toast.error("Failed to update password!");
     } finally {
-      setLoading('');
+      setLoadingPassword(false);
     }
   };
 
@@ -73,7 +100,7 @@ const SettingsPage = () => {
     <Layout>
       <div className="max-w-xl mx-auto space-y-4 md:space-y-6 px-2 md:px-0">
 
-        {/* Header - Responsive alignment */}
+        {/* Header */}
         <div className="flex items-center gap-3 mb-6 md:mb-8">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
             <Settings size={22} className="text-gray-500" />
@@ -90,15 +117,21 @@ const SettingsPage = () => {
             <Mail size={16} className="text-gray-400" />
             <h2 className="font-bold text-sm md:text-base text-gray-700">Change Email</h2>
           </div>
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
-          />
-          <button onClick={handleEmailUpdate} disabled={loading === 'email'}
-            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2.5 rounded-xl font-bold transition shadow-md active:scale-[0.98]">
-            {loading === 'email' ? "Saving..." : "Update Email"}
+          <div>
+            <input
+              {...registerEmail('email')}
+              type="email"
+              placeholder="your@email.com"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all ${emailErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+            />
+            {emailErrors.email && <p className="text-red-500 text-[11px] mt-1">{emailErrors.email.message}</p>}
+          </div>
+          <button
+            onClick={handleEmailSubmit(onEmailUpdate)}
+            disabled={loadingEmail}
+            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white py-2.5 rounded-xl font-bold transition shadow-sm active:scale-[0.98]"
+          >
+            {loadingEmail ? "Saving..." : "Update Email"}
           </button>
         </div>
 
@@ -109,24 +142,31 @@ const SettingsPage = () => {
             <h2 className="font-bold text-sm md:text-base text-gray-700">Change Password</h2>
           </div>
           <div className="space-y-3">
-            <input
-              type="password"
-              placeholder="New Password"
-              value={passwords.newPassword}
-              onChange={e => setPasswords({...passwords, newPassword: e.target.value})}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
-            />
-            <input
-              type="password"
-              placeholder="Confirm New Password"
-              value={passwords.confirmPassword}
-              onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all"
-            />
+            <div>
+              <input
+                {...registerPassword('newPassword')}
+                type="password"
+                placeholder="New Password"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all ${passwordErrors.newPassword ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+              />
+              {passwordErrors.newPassword && <p className="text-red-500 text-[11px] mt-1">{passwordErrors.newPassword.message}</p>}
+            </div>
+            <div>
+              <input
+                {...registerPassword('confirmPassword')}
+                type="password"
+                placeholder="Confirm New Password"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400/20 focus:border-red-400 transition-all ${passwordErrors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-200'}`}
+              />
+              {passwordErrors.confirmPassword && <p className="text-red-500 text-[11px] mt-1">{passwordErrors.confirmPassword.message}</p>}
+            </div>
           </div>
-          <button onClick={handlePasswordUpdate} disabled={loading === 'password'}
-            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2.5 rounded-xl font-bold transition shadow-md active:scale-[0.98]">
-            {loading === 'password' ? "Saving..." : "Update Password"}
+          <button
+            onClick={handlePasswordSubmit(onPasswordUpdate)}
+            disabled={loadingPassword}
+            className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white py-2.5 rounded-xl font-bold transition shadow-sm active:scale-[0.98]"
+          >
+            {loadingPassword ? "Saving..." : "Update Password"}
           </button>
         </div>
 
@@ -140,26 +180,11 @@ const SettingsPage = () => {
                 <p className="text-[10px] md:text-xs text-gray-400">Get notified about new blood requests</p>
               </div>
             </div>
-            <button onClick={() => setNotifications(!notifications)}
-              className={`w-12 h-6 rounded-full transition-all shrink-0 ${notifications ? 'bg-red-500' : 'bg-gray-200'}`}>
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-all mx-0.5 ${notifications ? 'translate-x-6' : 'translate-x-0'}`}/>
-            </button>
-          </div>
-        </div>
-
-        {/* Dark Mode */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 md:p-6 opacity-70">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Moon size={18} className="text-gray-400 shrink-0" />
-              <div>
-                <h2 className="font-bold text-sm md:text-base text-gray-700">Dark Mode</h2>
-                <p className="text-[10px] md:text-xs text-gray-400">Coming soon in next update!</p>
-              </div>
-            </div>
-            <button disabled
-              className="w-12 h-6 rounded-full bg-gray-200 cursor-not-allowed">
-              <div className="w-5 h-5 bg-white rounded-full shadow mx-0.5"/>
+            <button
+              onClick={() => setNotifications(!notifications)}
+              className={`w-12 h-6 rounded-full transition-all shrink-0 ${notifications ? 'bg-red-500' : 'bg-gray-200'}`}
+            >
+              <div className={`w-5 h-5 bg-white rounded-full shadow transition-all mx-0.5 ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
           </div>
         </div>
@@ -170,9 +195,13 @@ const SettingsPage = () => {
             <Trash2 size={16} className="text-red-400" />
             <h2 className="font-bold text-sm md:text-base text-red-500">Danger Zone</h2>
           </div>
-          <p className="text-[10px] md:text-xs text-gray-400 leading-relaxed">Once you delete your account, there is no going back. All your data will be permanently removed.</p>
-          <button onClick={handleDeleteAccount}
-            className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl font-bold transition active:scale-[0.98]">
+          <p className="text-[10px] md:text-xs text-gray-400 leading-relaxed">
+            Once you delete your account, there is no going back. All your data will be permanently removed.
+          </p>
+          <button
+            onClick={handleDeleteAccount}
+            className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl font-bold transition active:scale-[0.98]"
+          >
             Delete My Account
           </button>
         </div>

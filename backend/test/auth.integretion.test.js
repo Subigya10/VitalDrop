@@ -23,7 +23,8 @@ afterAll(async () => {
 
 beforeEach(async () => {
   // Clean users table before each test
-  await Users.destroy({ where: {}, truncate: true, cascade: true });
+    await Users.destroy({ where: { email: "test@example.com" } });
+  await Users.destroy({ where: { email: "admin@example.com" } });
 });
 
 // ─── Helper ─────────────────────────────────────────────────────────────────
