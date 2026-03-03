@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test":"jest",
+    "test": "jest",
     "start": "nodemon index.js",
     "dev": "nodemon index.js"
   },
@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "type": "module",
- 
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
@@ -27,6 +26,9 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "babel-jest": "^30.2.0",
     "jest": "^30.2.0",
     "sequelize-mock": "^0.10.2",
     "supertest": "^7.2.2"
