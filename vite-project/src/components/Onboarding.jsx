@@ -32,13 +32,14 @@ const Onboarding = ({ onDone }) => {
   const [exiting, setExiting] = useState(false);
 
   const next = () => {
-    if (current < SLIDES.length - 1) {
-      setExiting(true);
-      setTimeout(() => { setCurrent(c => c + 1); setExiting(false); }, 200);
-    } else {
-      onDone();
-    }
-  };
+  if (exiting) return; // ADD THIS - blocks rapid clicks
+  if (current < SLIDES.length - 1) {
+    setExiting(true);
+    setTimeout(() => { setCurrent(c => c + 1); setExiting(false); }, 200);
+  } else {
+    onDone();
+  }
+};
 
   const slide = SLIDES[current];
 
