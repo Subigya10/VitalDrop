@@ -56,8 +56,8 @@ describe("User Model", () => {
 //     expect(user.fullName).toBe("Jane Doe"); // John !== Jane → FAIL
 //   });
 it("should FAIL if fullName is missing (forced fail)", async () => {
-  const user = await UserModel.create({}); 
-//   await expect(UserModel.create({})).rejects.toThrow(); // No fields
+  // const user = await UserModel.create({}); 
+  await expect(UserModel.create({})).rejects.toThrow(); // No fields
   expect(user.fullName).toBeDefined(); // fullName is undefined → FAIL
 });
 

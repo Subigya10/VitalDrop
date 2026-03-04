@@ -258,3 +258,7 @@ describe("GET /api/auth/init", () => {
 // /forgotpass — 3 tests
 // /resetpass — 5 tests
 // /init — 2 tests
+
+
+
+// npx jest auth.integretion.test.js

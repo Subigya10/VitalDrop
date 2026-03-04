@@ -66,7 +66,7 @@ describe("BloodRequests Model", () => {
       hospitalLocation: "Central Hospital",
     });
 
-    expect(request.patientName).toBeDefined(); // will fail if patientName is undefined
+    expect(request.patientName).toBeDefined(); 
   });
 
 });
