@@ -5,6 +5,34 @@ import Layout from '../../components/Layout.jsx';
 import toast from 'react-hot-toast';
 import { SkeletonList } from '../../components/SkeletonCard';
 
+const STATUS_STYLES = {
+  pending:   'bg-yellow-100 text-yellow-600',
+  accepted:  'bg-green-100 text-green-600',
+  fulfilled: 'bg-green-100 text-green-600',
+  approved:  'bg-green-100 text-green-600',
+  completed: 'bg-green-100 text-green-600',
+  scheduled: 'bg-blue-100 text-blue-600',
+  rejected:  'bg-red-100 text-red-600',
+  cancelled: 'bg-gray-100 text-gray-500',
+};
+
+const STATUS_LABELS = {
+  pending:   '⏳ Pending',
+  accepted:  '✅ Accepted',
+  fulfilled: '✅ Fulfilled',
+  approved:  '✅ Approved',
+  completed: '✅ Completed',
+  scheduled: '📅 Scheduled',
+  rejected:  '❌ Rejected',
+  cancelled: '❌ Cancelled',
+};
+
+const StatusBadge = ({ status }) => (
+  <span className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap capitalize ${STATUS_STYLES[status] || 'bg-gray-100 text-gray-400'}`}>
+    {STATUS_LABELS[status] || status}
+  </span>
+);
+
 const Activity = () => {
   const [tab, setTab] = useState('requests');
   const [myRequests, setMyRequests] = useState([]);
@@ -13,14 +41,9 @@ const Activity = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-
     Promise.all([
-      axios.get('http://localhost:5000/api/requests/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      }),
-      axios.get('http://localhost:5000/api/donations/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      axios.get('http://localhost:5000/api/requests/my',  { headers: { Authorization: `Bearer ${token}` } }),
+      axios.get('http://localhost:5000/api/donations/my', { headers: { Authorization: `Bearer ${token}` } }),
     ]).then(([reqRes, donRes]) => {
       setMyRequests(reqRes.data);
       setMyDonations(donRes.data);
@@ -65,10 +88,9 @@ const Activity = () => {
         </div>
 
         {loading ? (
-  <SkeletonList count={4} />
+          <SkeletonList count={4} />
         ) : tab === 'requests' ? (
 
-          // ── MY REQUESTS TAB ──
           myRequests.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-10 md:p-16 text-center shadow-sm">
               <Droplets size={40} className="text-gray-200 mx-auto mb-3" />
@@ -93,14 +115,8 @@ const Activity = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex justify-end sm:block">
-                    <span className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap ${
-                      req.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-600'
-                        : 'bg-green-100 text-green-600'
-                    }`}>
-                      {req.status === 'pending' ? 'Pending' : 'Fulfilled'}
-                    </span>
+                  <div className="flex justify-end sm:block shrink-0">
+                    <StatusBadge status={req.status} />
                   </div>
                 </div>
               ))}
@@ -109,7 +125,6 @@ const Activity = () => {
 
         ) : (
 
-          // ── MY DONATIONS TAB ──
           myDonations.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-100 p-10 md:p-16 text-center shadow-sm">
               <Heart size={40} className="text-gray-200 mx-auto mb-3" />
@@ -134,16 +149,8 @@ const Activity = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex justify-end sm:block">
-                    <span className={`px-3 py-1 rounded-full text-[10px] md:text-xs font-bold whitespace-nowrap ${
-                      don.status === 'scheduled'
-                        ? 'bg-blue-100 text-blue-600'
-                        : don.status === 'completed'
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {don.status === 'scheduled' ? '📅 Scheduled' : don.status === 'completed' ? '✅ Completed' : '❌ Cancelled'}
-                    </span>
+                  <div className="flex justify-end sm:block shrink-0">
+                    <StatusBadge status={don.status} />
                   </div>
                 </div>
               ))}

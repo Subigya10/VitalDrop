@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, AlertCircle, Heart, MapPin, 
-  History, User, Settings, LogOut, Menu, X, Search, Trophy, ShieldCheck
+  History, User, Settings, LogOut, Menu, X, Search, Trophy, ShieldCheck, Droplets
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -60,6 +60,7 @@ const Layout = ({ children }) => {
           <SidebarItem to="/activity"    icon={<History size={20}/>}         label="My Activity" onClick={closeMenu} />
           <SidebarItem to="/profile"     icon={<User size={20}/>}            label="Profile"     onClick={closeMenu} />
           <SidebarItem to="/settings"    icon={<Settings size={20}/>}        label="Settings"    onClick={closeMenu} />
+          <SidebarItem to="/compatibility" icon={<Droplets size={20}/>} label="Compatibility" onClick={closeMenu} />
           
           {/* Admin only */}
           {localStorage.getItem('role') === 'admin' && (

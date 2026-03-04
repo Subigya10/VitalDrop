@@ -29,6 +29,18 @@ const colorMap = {
   green:  'bg-green-500/20 text-green-400',
 };
 
+const urgencyConfig = {
+  critical: 'bg-red-500/20 text-red-400 border-red-500/30',
+  moderate: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+  normal:   'bg-green-500/20 text-green-400 border-green-500/30',
+};
+
+const urgencyLabel = {
+  critical: '🔴 Critical',
+  moderate: '🟡 Moderate',
+  normal:   '🟢 Normal',
+};
+
 /* ── Add User Modal ── */
 const AddUserModal = ({ onClose, onAdded }) => {
   const [form, setForm] = useState({ fullName: '', email: '', password: '', bloodGroup: '', role: 'user' });
@@ -60,26 +72,22 @@ const AddUserModal = ({ onClose, onAdded }) => {
         </div>
         <div className="space-y-4">
           {[
-            { label: 'Full Name', key: 'fullName', type: 'text', placeholder: 'John Doe' },
+            { label: 'Full Name', key: 'fullName', type: 'text',  placeholder: 'John Doe' },
             { label: 'Email',     key: 'email',    type: 'email', placeholder: 'john@example.com' },
           ].map(f => (
             <div key={f.key}>
               <label className="text-xs font-semibold text-gray-400 mb-1.5 block">{f.label}</label>
-              <input
-                type={f.type} placeholder={f.placeholder} value={form[f.key]}
+              <input type={f.type} placeholder={f.placeholder} value={form[f.key]}
                 onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                className="w-full bg-gray-800 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500"
-              />
+                className="w-full bg-gray-800 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500" />
             </div>
           ))}
           <div>
             <label className="text-xs font-semibold text-gray-400 mb-1.5 block">Password</label>
             <div className="relative">
-              <input
-                type={showPass ? 'text' : 'password'} placeholder="••••••••" value={form.password}
+              <input type={showPass ? 'text' : 'password'} placeholder="••••••••" value={form.password}
                 onChange={e => setForm(p => ({ ...p, password: e.target.value }))}
-                className="w-full bg-gray-800 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500 pr-10"
-              />
+                className="w-full bg-gray-800 border border-white/10 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-red-500 pr-10" />
               <button onClick={() => setShowPass(p => !p)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
                 {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -175,53 +183,55 @@ const Sidebar = ({ tab, setTab, onClose }) => {
 
 /* ── Main ── */
 const AdminDashboard = () => {
-  const [tab, setTab] = useState('Overview');
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [tab, setTab]               = useState('Overview');
+  const [menuOpen, setMenuOpen]     = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [donations, setDonations] = useState([]);
+  const [users, setUsers]           = useState([]);
+  const [donations, setDonations]   = useState([]);
   const [bloodRequests, setBloodRequests] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats]           = useState(null);
+  const [loading, setLoading]       = useState(true);
 
   useEffect(() => { fetchAll(); }, []);
 
+  // FIX: use /requests/all instead of /requests
   const fetchAll = async () => {
     setLoading(true);
     try {
       const [u, d, r] = await Promise.all([
-        axios.get(`${API}/users`, { headers: headers() }),
-        axios.get(`${API}/donations`, { headers: headers() }),
-        axios.get(`${API}/requests`, { headers: headers() }),
+        axios.get(`${API}/users`,         { headers: headers() }),
+        axios.get(`${API}/donations`,     { headers: headers() }),
+        axios.get(`${API}/requests/all`,  { headers: headers() }), // ✅ fixed endpoint
       ]);
       setUsers(u.data);
       setDonations(d.data);
       setBloodRequests(r.data);
       setStats({
-        totalUsers: u.data.length,
-        totalDonations: d.data.length,
-        pendingRequests: r.data.filter(x => x.status === 'pending').length,
+        totalUsers:         u.data.length,
+        totalDonations:     d.data.length,
+        pendingRequests:    r.data.filter(x => x.status === 'pending').length,
         completedDonations: d.data.filter(x => x.status === 'completed').length,
       });
     } catch { toast.error('Failed to load data'); }
     setLoading(false);
   };
 
-  const deleteUser     = async (id) => { await axios.delete(`${API}/users/${id}`, { headers: headers() }); setUsers(p => p.filter(x => x.userId !== id)); toast.success('User deleted'); };
+  // FIX: all deletes now call fetchAll() instead of manually filtering
+  const deleteUser     = async (id) => { await axios.delete(`${API}/users/${id}`, { headers: headers() }); fetchAll(); toast.success('User deleted'); };
   const toggleRole     = async (u)  => { const r = u.role === 'admin' ? 'user' : 'admin'; await axios.patch(`${API}/users/${u.userId}`, { role: r }, { headers: headers() }); setUsers(p => p.map(x => x.userId === u.userId ? { ...x, role: r } : x)); toast.success(`${u.fullName} is now ${r}`); };
   const updateDonation = async (id, status) => { await axios.patch(`${API}/donations/${id}`, { status }, { headers: headers() }); setDonations(p => p.map(x => x.id === id ? { ...x, status } : x)); toast.success('Updated'); };
-  const deleteDonation = async (id) => { await axios.delete(`${API}/donations/${id}`, { headers: headers() }); setDonations(p => p.filter(x => x.id !== id)); toast.success('Donation deleted'); };
+  const deleteDonation = async (id) => { await axios.delete(`${API}/donations/${id}`, { headers: headers() }); fetchAll(); toast.success('Donation deleted'); }; // ✅ fixed
   const updateRequest  = async (id, status) => { await axios.patch(`${API}/requests/${id}`, { status }, { headers: headers() }); setBloodRequests(p => p.map(x => x.id === id ? { ...x, status } : x)); toast.success('Updated'); };
-  const deleteRequest  = async (id) => { await axios.delete(`${API}/requests/${id}`, { headers: headers() }); setBloodRequests(p => p.filter(x => x.id !== id)); toast.success('Request deleted'); };
+  const deleteRequest  = async (id) => { await axios.delete(`${API}/requests/${id}`, { headers: headers() }); fetchAll(); toast.success('Request deleted'); }; // ✅ fixed
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!confirmDelete) return;
     const { type, id } = confirmDelete;
     try {
-      if (type === 'user') deleteUser(id);
-      if (type === 'donation') deleteDonation(id);
-      if (type === 'request') deleteRequest(id);
+      if (type === 'user')     await deleteUser(id);
+      if (type === 'donation') await deleteDonation(id);
+      if (type === 'request')  await deleteRequest(id);
     } catch { toast.error('Failed to delete'); }
     setConfirmDelete(null);
   };
@@ -288,14 +298,14 @@ const AdminDashboard = () => {
               {tab === 'Overview' && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard icon={<Users size={22} />}        color="blue"   label="Total Users"      value={stats?.totalUsers} />
-                    <StatCard icon={<Heart size={22} />}        color="red"    label="Total Donations"  value={stats?.totalDonations} />
+                    <StatCard icon={<Users size={22} />}         color="blue"   label="Total Users"      value={stats?.totalUsers} />
+                    <StatCard icon={<Heart size={22} />}         color="red"    label="Total Donations"  value={stats?.totalDonations} />
                     <StatCard icon={<ClipboardList size={22} />} color="yellow" label="Pending Requests" value={stats?.pendingRequests} />
-                    <StatCard icon={<CheckCircle size={22} />}  color="green"  label="Completed"        value={stats?.completedDonations} />
+                    <StatCard icon={<CheckCircle size={22} />}   color="green"  label="Completed"        value={stats?.completedDonations} />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <RecentCard title="Recent Donations" items={donations.slice(0,5).map(d => ({ key: d.id, name: d.donorName, sub: `${d.hospital} · ${d.bloodGroup}`, status: d.status }))} />
-                    <RecentCard title="Recent Blood Requests" items={bloodRequests.slice(0,5).map(r => ({ key: r.id, name: r.patientName, sub: `${r.hospitalLocation} · ${r.bloodGroup}`, status: r.status }))} />
+                    <RecentCard title="Recent Donations"      items={donations.slice(0,5).map(d => ({ key: d.id, name: d.donorName, sub: `${d.hospital} · ${d.bloodGroup}`, status: d.status }))} />
+                    <RecentCard title="Recent Blood Requests" items={bloodRequests.slice(0,5).map(r => ({ key: r.id, name: r.patientName, sub: `${r.hospitalLocation} · ${r.bloodGroup}`, status: r.status, urgency: r.urgency }))} />
                   </div>
                 </div>
               )}
@@ -403,18 +413,29 @@ const AdminDashboard = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-white/10">
-                          {['Patient','Blood','Units','Hospital','Status','Actions'].map(h => (
+                          {['Patient','Blood','Units','Hospital','Urgency','Status','Actions'].map(h => (
                             <th key={h} className="text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider px-5 py-4">{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
-                        {bloodRequests.map(r => (
-                          <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                        {bloodRequests
+                          .sort((a, b) => {
+                            const order = { critical: 0, moderate: 1, normal: 2 };
+                            return (order[a.urgency] ?? 2) - (order[b.urgency] ?? 2);
+                          })
+                          .map(r => (
+                          <tr key={r.id} className={`border-b border-white/5 hover:bg-white/[0.03] transition-colors ${r.urgency === 'critical' ? 'bg-red-500/5' : ''}`}>
                             <td className="px-5 py-3.5 text-sm font-semibold text-white">{r.patientName}</td>
                             <td className="px-5 py-3.5"><span className="bg-red-600/20 text-red-400 border border-red-600/30 text-xs font-bold px-2.5 py-1 rounded-lg">{r.bloodGroup}</span></td>
                             <td className="px-5 py-3.5 text-sm text-gray-400">{r.unitsNeeded}</td>
                             <td className="px-5 py-3.5 text-sm text-gray-400">{r.hospitalLocation}</td>
+                            {/* ✅ NEW: Urgency column */}
+                            <td className="px-5 py-3.5">
+                              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${urgencyConfig[r.urgency] || urgencyConfig.normal}`}>
+                                {urgencyLabel[r.urgency] || '🟢 Normal'}
+                              </span>
+                            </td>
                             <td className="px-5 py-3.5"><span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${statusColor[r.status]||'bg-gray-700 text-gray-400 border-white/5'}`}>{r.status}</span></td>
                             <td className="px-5 py-3.5">
                               <div className="flex items-center gap-1">
@@ -432,7 +453,7 @@ const AdminDashboard = () => {
                             </td>
                           </tr>
                         ))}
-                        {bloodRequests.length === 0 && <EmptyRow cols={6} />}
+                        {bloodRequests.length === 0 && <EmptyRow cols={7} />}
                       </tbody>
                     </table>
                   </div>
@@ -460,12 +481,19 @@ const RecentCard = ({ title, items }) => (
     <div className="space-y-3">
       {items.length === 0 && <p className="text-gray-600 text-sm">No data yet</p>}
       {items.map(item => (
-        <div key={item.key} className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-white">{item.name}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{item.sub}</p>
+        <div key={item.key} className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-white truncate">{item.name}</p>
+            <p className="text-xs text-gray-500 mt-0.5 truncate">{item.sub}</p>
           </div>
-          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${statusColor[item.status]||'bg-gray-700 text-gray-400 border-white/5'}`}>{item.status}</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {item.urgency && (
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${urgencyConfig[item.urgency] || urgencyConfig.normal}`}>
+                {urgencyLabel[item.urgency] || '🟢'}
+              </span>
+            )}
+            <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border ${statusColor[item.status]||'bg-gray-700 text-gray-400 border-white/5'}`}>{item.status}</span>
+          </div>
         </div>
       ))}
     </div>

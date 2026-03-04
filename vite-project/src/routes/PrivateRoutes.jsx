@@ -12,6 +12,7 @@ const Donate      = React.lazy(() => import("../pages/private/Donate.jsx"));
 const DonorSearch = React.lazy(() => import("../pages/private/DonorSearch.jsx"));
 const Leaderboard = React.lazy(() => import("../pages/private/Leaderboard.jsx"));
 const AdminDashboard = React.lazy(() => import("../pages/private/AdminDashboard.jsx"));
+const BloodCompatibility = React.lazy(() => import("../pages/private/BloodCompatibility.jsx"));
 
 const Spinner = () => (
   <div className="flex items-center justify-center min-h-screen bg-gray-950">
@@ -33,6 +34,7 @@ const PrivateRoutes = () => (
         <Route path="/donate"      element={<Donate />} />
         <Route path="/donors"      element={<DonorSearch />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/compatibility" element={<BloodCompatibility />} />
       </Route>
 
       {/* ADMIN ONLY — users get bounced to /dashboard */}

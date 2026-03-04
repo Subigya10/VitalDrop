@@ -65,7 +65,6 @@ function Signuppage() {
   };
 
   const onSubmit = async (data) => {
-     
     try {
       const formData = new FormData();
       formData.append("fullName", data.firstName + (data.lastName ? " " + data.lastName : ""));
@@ -77,7 +76,6 @@ function Signuppage() {
       formData.append("address", data.address);
       formData.append("bloodGroup", data.bloodGroup);
 
-      // combine checkboxes + extra notes into one string
       const checked = (data.medicalHistory || []).join(", ");
       const notes = data.medicalNotes || "";
       const combined = [checked, notes].filter(Boolean).join(" | ");
@@ -156,10 +154,26 @@ function Signuppage() {
                     {errors.email && <p className="text-red-500 text-[10px] mt-1">{errors.email.message}</p>}
                   </div>
                   <div>
-                    <input type="tel" placeholder="Phone Number * (e.g. 9841234567)" {...register("phone")}
-                      className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm w-full focus:ring-2 focus:ring-red-400/20 focus:border-red-400 outline-none transition-all" />
-                    {errors.phone && <p className="text-red-500 text-[10px] mt-1">{errors.phone.message}</p>}
-                  </div>
+                 
+  <input
+  type="tel"
+  placeholder="Phone Number *"
+  {...register("phone", { shouldUnregister: false })}
+  maxLength={10}
+  onKeyDown={(e) => {
+    if (!/[0-9]/.test(e.key) && !["Backspace","Delete","ArrowLeft","ArrowRight","Tab"].includes(e.key)) {
+      e.preventDefault();
+    }
+  }}
+  onChange={(e) => {
+    const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setValue("phone", val, { shouldValidate: true, shouldDirty: true });
+  }}
+  onBlur={() => setValue("phone", watch("phone") || "", { shouldValidate: true })}
+  className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm w-full focus:ring-2 focus:ring-red-400/20 focus:border-red-400 outline-none transition-all"
+/>
+{errors.phone && <p className="text-red-500 text-[10px] mt-1">{errors.phone.message}</p>}
+</div>
                   <div>
                     <div className="relative">
                       <input type={showPassword ? "text" : "password"} placeholder="Password *" {...register("password")}
@@ -203,8 +217,12 @@ function Signuppage() {
                   </div>
                   <div>
                     <label className="text-xs font-bold text-gray-500 mb-1 block">Date of Birth *</label>
-                    <input type="date" {...register("dateOfBirth")} max={new Date().toISOString().split('T')[0]}
-                      className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm w-full focus:ring-2 focus:ring-red-400/20 focus:border-red-400 outline-none transition-all" />
+                  <input 
+  type="date" 
+  {...register("dateOfBirth")} 
+  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+  className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm w-full focus:ring-2 focus:ring-red-400/20 focus:border-red-400 outline-none transition-all" 
+/>
                     {errors.dateOfBirth && <p className="text-red-500 text-[10px] mt-1">{errors.dateOfBirth.message}</p>}
                   </div>
                   <div>
@@ -219,8 +237,6 @@ function Signuppage() {
               <div>
                 <p className="text-xs font-black text-gray-400 uppercase tracking-wider mb-3">Medical Information</p>
                 <div className="space-y-3">
-
-                  {/* Blood Group */}
                   <div>
                     <label className="text-xs font-bold text-gray-500 mb-1 block">Blood Group *</label>
                     <select {...register("bloodGroup")}
@@ -232,8 +248,6 @@ function Signuppage() {
                     </select>
                     {errors.bloodGroup && <p className="text-red-500 text-[10px] mt-1">{errors.bloodGroup.message}</p>}
                   </div>
-
-                  {/* Checkboxes */}
                   <div>
                     <label className="text-xs font-bold text-gray-500 mb-2 block">
                       Medical History (select all that apply)
@@ -256,8 +270,6 @@ function Signuppage() {
                       ))}
                     </div>
                   </div>
-
-                  {/* ── TEXTAREA ── */}
                   <div>
                     <label className="text-xs font-bold text-gray-500 mb-1 block">
                       Additional Notes <span className="font-normal text-gray-400">(optional)</span>
@@ -269,7 +281,6 @@ function Signuppage() {
                       className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm w-full focus:ring-2 focus:ring-red-400/20 focus:border-red-400 outline-none transition-all resize-none"
                     />
                   </div>
-
                 </div>
               </div>
 
@@ -299,8 +310,13 @@ function Signuppage() {
           </div>
 
           {/* ── IMAGE SIDE ── */}
-          <div className="hidden md:flex md:w-1/2 relative bg-[#FFF5F5]">
-            <img src={sleep} alt="signup visual" className="absolute inset-0 w-full h-full object-cover object-center" />
+          <div className="hidden md:block md:w-1/2 sticky top-0 h-screen">
+            <img
+              src={sleep}
+              alt="signup visual"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: "center top" }}
+            />
             <div className="absolute inset-0 bg-red-900/10" />
           </div>
 

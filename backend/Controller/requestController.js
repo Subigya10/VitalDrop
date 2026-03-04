@@ -3,17 +3,17 @@ import { BloodRequests } from "../Model/requestModel.js";
 // Logic for the "Post Request" button
 export const createBloodRequest = async (req, res) => {
   try {
-    const { patientName, bloodGroup, unitsNeeded, hospitalLocation } = req.body;
+  const { patientName, bloodGroup, unitsNeeded, hospitalLocation, urgency } = req.body;
 
-    // FIX: We must include the requesterId from the decoded token (verifyToken)
-    const newRequest = await BloodRequests.create({
-      patientName,
-      bloodGroup,
-      unitsNeeded,
-      hospitalLocation,
-      requesterId: req.user.id, // This links the request to YOU
-      status: "pending"
-    });
+const newRequest = await BloodRequests.create({
+  patientName,
+  bloodGroup,
+  unitsNeeded,
+  hospitalLocation,
+  urgency,          // 👈 just add this line
+  requesterId: req.user.id,
+  status: "pending"
+});
 
     res.status(201).json({ 
       success: true, 

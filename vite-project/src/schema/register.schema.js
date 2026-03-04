@@ -11,7 +11,8 @@ export const RegisterSchema = z.object({
   email: z.string().email("Enter a valid email address"),
   phone: z
     .string()
-    .regex(/^(\+977)?[0-9]{7,10}$/, "Enter a valid Nepal phone number"),
+    .min(1, "Phone number is required")
+    .regex(/^(97|98)\d{8}$/, "Must start with 97 or 98 and be exactly 10 digits"),
   password: z
     .string()
     .min(6, "Minimum 6 characters")
@@ -25,26 +26,30 @@ export const RegisterSchema = z.object({
   }),
 
   // ── PERSONAL INFO ──
- // ✅ Replace with
-gender: z.string().nullable().refine(val => ["Male", "Female", "Other"].includes(val ?? ""), {
-  message: "Please select your gender",
-}),
-
-bloodGroup: z.string().refine(val => ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(val), {
-  message: "Please select your blood group",
-}),
+  gender: z.string().nullable().refine(val => ["Male", "Female", "Other"].includes(val ?? ""), {
+    message: "Please select your gender",
+  }),
+  bloodGroup: z.string().refine(val => ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(val), {
+    message: "Please select your blood group",
+  }),
   dateOfBirth: z
     .string()
     .min(1, "Date of birth is required")
     .refine((val) => !isNaN(Date.parse(val)), { message: "Enter a valid date" })
-    .refine((val) => new Date(val) < today, { message: "Date of birth must be in the past" }),
+    .refine((val) => new Date(val) < today, { message: "Date of birth must be in the past" })
+    .refine((val) => {
+      const dob = new Date(val);
+      const age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      const exactAge = m < 0 || (m === 0 && today.getDate() < dob.getDate()) ? age - 1 : age;
+      return exactAge >= 18;
+    }, { message: "You must be at least 18 years old" }),
   address: z.string().min(2, "Address is required").max(200, "Address too long"),
 
   // ── MEDICAL INFO ──
- 
- medicalNotes: z.string().optional(),
+  medicalNotes: z.string().optional(),
 
-  // ── PROFILE PHOTO ── optional, just store filename/url
+  // ── PROFILE PHOTO ──
   profilePhoto: z.any().optional(),
 
 }).refine((data) => data.password === data.confirmPassword, {

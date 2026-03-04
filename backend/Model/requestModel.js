@@ -37,6 +37,10 @@ export const BloodRequests = sequelize.define("BloodRequests", {
     type: DataTypes.STRING, 
     defaultValue: "pending" 
   },
+  urgency: {
+  type: DataTypes.STRING,
+  defaultValue: "normal"
+},
 }, {
   timestamps: true 
 });
