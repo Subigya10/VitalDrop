@@ -263,6 +263,7 @@ const Nearby = () => {
           </div>
         ) : (
           <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm" style={{ height: '500px' }}>
+           
             <MapContainer center={[userLocation.lat, userLocation.lng]} zoom={12} style={{ height: '100%', width: '100%' }}>
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

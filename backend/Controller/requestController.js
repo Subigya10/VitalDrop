@@ -10,12 +10,11 @@ const newRequest = await BloodRequests.create({
   bloodGroup,
   unitsNeeded,
   hospitalLocation,
-  urgency,          // 👈 just add this line
+  urgency,       
   requesterId: req.user.id,
   status: "pending"
 });
-
-    res.status(201).json({ 
+res.status(201).json({ 
       success: true, 
       message: "Request posted successfully!", 
       data: newRequest 

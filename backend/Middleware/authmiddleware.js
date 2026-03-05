@@ -20,15 +20,9 @@ export const verifyToken = (req, res, next) => {
   try {
     // 4. Verify the token using your secret key
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    /**
-     * IMPORTANT: Since your generateToken signs the payload directly:
-     * jwt.sign(payload, ...) -> decoded IS the payload.
-     * We attach it directly to req.user.
-     */
     req.user = decoded; 
 
-    // 5. Proceed to the controller (e.g., createBloodRequest or acceptRequest)
+     // 5. Proceed to the controller (e.g., createBloodRequest or acceptRequest)
     next();
   } catch (err) {
     console.error("JWT Verification Error:", err.message);

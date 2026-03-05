@@ -2,7 +2,7 @@ import express from "express";
 import { connection } from "./Database/db.js";
 import { router as userRouter } from "./Routes/userRoute.js";
 import { authRouter } from "./Routes/authRoute.js";
-import { productRouter } from "./Routes/productRoutes.js";
+
 import cors from "cors";
 import { createUploadsFolder } from "./Security/helper.js"; 
 import uploadRouter from "./Routes/uploadRoutes.js";
@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/product", productRouter);
+
 app.use("/api/file", uploadRouter);
 app.use("/api/requests", requestRouter);
 app.use("/api/donations", donationRouter);

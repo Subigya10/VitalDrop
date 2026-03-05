@@ -5,8 +5,6 @@ import { Op } from "sequelize";
 // REGISTER
 export const register = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
     const {
       fullName,
       email,

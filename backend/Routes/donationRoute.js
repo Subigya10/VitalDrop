@@ -3,7 +3,6 @@ import { createDonation, getMyDonations, getLeaderboard, getAllDonations, update
 import { verifyToken } from '../Middleware/authmiddleware.js';
 
 const router = express.Router();
-
 router.get('/', verifyToken, getAllDonations);
 router.post('/', verifyToken, createDonation);
 router.get('/my', verifyToken, getMyDonations);
